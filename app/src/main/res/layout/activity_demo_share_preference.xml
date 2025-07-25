@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Demo Share Preference"
+        android:textSize="20sp"
+        android:layout_gravity="center_horizontal"
+        android:textStyle="bold"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="enter number 1"
+        android:autofillHints="false"
+        android:inputType="number"
+        android:id="@+id/edtNumber1"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="enter number 2"
+        android:autofillHints="false"
+        android:inputType="number"
+        android:id="@+id/edtNumber2"
+        android:layout_marginTop="15dp"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:hint="Result"
+        android:autofillHints="false"
+        android:inputType="text"
+        android:id="@+id/edtResult"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sum number"
+        android:id="@+id/btnSumNumber"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear Data"
+        android:id="@+id/btnClearData"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:text="History"
+        android:id="@+id/tvHistory"/>
+</LinearLayout>

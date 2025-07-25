@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BTec - FPT"
+        android:textSize="20sp"
+        android:textColor="#E60E0E"
+        android:layout_gravity="center_horizontal"/>
+    <ImageView
+        android:layout_width="180dp"
+        android:layout_height="150dp"
+        android:src="@drawable/logo_btec"
+        android:layout_gravity="center_horizontal"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:autofillHints="false"
+        android:background="#04DCF4"
+        android:hint="Enter username"
+        android:paddingStart="10dp"
+        android:layout_marginTop="10dp"
+        android:inputType="text"
+        android:id="@+id/edtUsername"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:autofillHints="false"
+        android:background="#04DCF4"
+        android:hint="Enter password"
+        android:paddingStart="10dp"
+        android:layout_marginTop="8dp"
+        android:inputType="textPassword"
+        android:id="@+id/edtPassword"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:backgroundTint="#0E86E4"
+            android:id="@+id/btnLogin"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:backgroundTint="#E61717"
+            android:layout_weight="1"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Do you have an account ?"
+        android:layout_gravity="center_horizontal"
+        android:textSize="15sp"
+        android:textStyle="bold|italic"
+        android:layout_marginTop="10dp"
+        android:id="@+id/tvRegisterAccount"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forget password"
+        android:layout_gravity="center_horizontal"
+        android:textSize="15sp"/>
+</LinearLayout>

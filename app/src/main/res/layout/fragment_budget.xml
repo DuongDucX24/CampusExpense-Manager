@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BudgetFragment"
+    android:padding="10dp">
+    <!-- TODO: Update blank fragment layout -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#07A6ED"
+        android:text="Create Budget"
+        android:id="@+id/btnCreateBudget"
+        android:padding="8dp"
+        android:layout_marginTop="5dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btnCreateBudget"
+        android:layout_marginTop="10dp"
+        android:id="@+id/rvBudget"
+        android:layout_marginBottom="?actionBarSize"/>
+</RelativeLayout>
