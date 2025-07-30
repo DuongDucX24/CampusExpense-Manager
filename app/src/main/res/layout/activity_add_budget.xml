@@ -13,7 +13,8 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText"
+        android:textColor="@android:color/black"/>
 
     <EditText
         android:id="@+id/edtBudgetName"
@@ -47,7 +48,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#03A9F4"
+        android:background="#FFA500"
         android:text="Save"
         android:layout_marginTop="15dp"
         android:id="@+id/btnSaveBudget"/>
@@ -55,5 +56,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Back"
-        android:id="@+id/btnBackBudget"/>
+        android:id="@+id/btnBackBudget"
+        android:layout_marginTop="15dp"
+        android:background="#FFA500"
+        tools:ignore="HardcodedText,VisualLintButtonSize"/>
 </LinearLayout>
