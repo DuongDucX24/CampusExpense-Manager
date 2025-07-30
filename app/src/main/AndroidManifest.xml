@@ -25,6 +25,7 @@
         <activity android:name=".MenuActivity"/>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".budget.AddBudgetActivity"/>
+        <activity android:name=".budget.EditBudgetActivity"/>
         <activity
             android:name=".LoginActivity"
             android:exported="true">
