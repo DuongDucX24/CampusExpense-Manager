@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
     android:autofillHints=""
-    tools:ignore="VisualLintButtonSize" >
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:ignore="VisualLintButtonSize">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:text="Add Expense"
+        android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_gravity="center_horizontal"
         tools:ignore="HardcodedText" />
 
     <EditText
@@ -22,10 +23,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:autofillHints=""
         android:hint="Enter expense name"
         android:inputType="text"
         android:minHeight="48dp"
-        android:autofillHints=""
         tools:ignore="HardcodedText" />
 
     <EditText
@@ -49,19 +50,23 @@
         android:inputType="textMultiLine"
         android:minHeight="48dp"
         tools:ignore="HardcodedText" />
+
     <Button
+        android:id="@+id/btnSaveExpense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
         android:layout_marginTop="15dp"
-        android:id="@+id/btnSaveExpense"
-        tools:ignore="HardcodedText" />
+        android:text="Save"
+        tools:ignore="HardcodedText"
+        android:background="#FFA500"/>
+
     <Button
+        android:id="@+id/btnBackExpense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Back"
-        android:id="@+id/btnBackExpense"
-        tools:ignore="HardcodedText,VisualLintButtonSize" />
+        tools:ignore="HardcodedText,VisualLintButtonSize"
+        android:background="#FFA500"/>
 
 </LinearLayout>
 
