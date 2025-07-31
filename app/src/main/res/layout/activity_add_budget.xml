@@ -62,9 +62,13 @@
         android:text="Back"
         android:id="@+id/btnBackBudget"
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         android:layout_marginTop="15dp"
         android:background="#FFA500"
         tools:ignore="HardcodedText,VisualLintButtonSize"/>
+=======
+        tools:ignore="VisualLintButtonSize" />
+>>>>>>> Stashed changes
 =======
         tools:ignore="VisualLintButtonSize" />
 >>>>>>> Stashed changes
