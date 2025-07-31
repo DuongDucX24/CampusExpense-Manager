@@ -3,7 +3,6 @@ package com.example.se07101campusexpenses;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -25,15 +24,12 @@ public class TestLifeCycleActivity extends AppCompatActivity {
         // anh xa giao dien - tim phn tu ngoai view(giao dien)
         btnFirstActivity = findViewById(R.id.btnFirstActivity); // tim phan tu
         // bat su kien
-        btnFirstActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // bat ra thong bao
-                Toast.makeText(TestLifeCycleActivity.this, "Go to an other Activity", Toast.LENGTH_SHORT).show();
-                // di chuyen sang mot activity khac
-                Intent intent = new Intent(TestLifeCycleActivity.this, LifeCycleSecondActivity.class);
-                startActivity(intent);
-            }
+        btnFirstActivity.setOnClickListener(v -> {
+            // bat ra thong bao
+            Toast.makeText(TestLifeCycleActivity.this, "Go to an other Activity", Toast.LENGTH_SHORT).show();
+            // di chuyen sang mot activity khac
+            Intent intent = new Intent(TestLifeCycleActivity.this, LifeCycleSecondActivity.class);
+            startActivity(intent);
         });
     }
 

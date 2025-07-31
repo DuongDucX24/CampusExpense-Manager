@@ -11,7 +11,6 @@ import com.example.se07101campusexpenses.R;
 
 public class AddExpenseActivity extends AppCompatActivity {
     private EditText edtExpenseName, edtExpenseAmount, edtExpenseDescription;
-    private Button btnSaveExpense, btnBackExpense;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +20,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         edtExpenseName = findViewById(R.id.edtExpenseName);
         edtExpenseAmount = findViewById(R.id.edtExpenseAmount);
         edtExpenseDescription = findViewById(R.id.edtExpenseDescription);
-        btnSaveExpense = findViewById(R.id.btnSaveExpense);
-        btnBackExpense = findViewById(R.id.btnBackExpense);
+        Button btnSaveExpense = findViewById(R.id.btnSaveExpense);
+        Button btnBackExpense = findViewById(R.id.btnBackExpense);
 
         btnSaveExpense.setOnClickListener(v -> addExpense());
         btnBackExpense.setOnClickListener(v -> finish());
@@ -35,7 +34,7 @@ public class AddExpenseActivity extends AppCompatActivity {
 
         Toast Toast = null;
         if (name.isEmpty() || amountStr.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            android.widget.Toast.makeText(this, "Please fill all fields", android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -45,7 +44,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         // Update the related budget's remaining amount
         // Example: budget.setRemaining(budget.getRemaining() - amount);
 
-        Toast.makeText(this, "Expense added", Toast.LENGTH_SHORT).show();
+        android.widget.Toast.makeText(this, "Expense added", android.widget.Toast.LENGTH_SHORT).show();
         finish();
     }
 }

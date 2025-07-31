@@ -2,7 +2,6 @@ package com.example.se07101campusexpenses;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,27 +33,21 @@ public class DemoSharePreferenceActivity extends AppCompatActivity {
         // block Edit Text Result
         edtResult.setEnabled(false);
         // event click button Sum number
-        btnSumNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long number1 = Integer.parseInt(edtNumber1.getText().toString().trim());
-                long number2 = Integer.parseInt(edtNumber2.getText().toString().trim());
-                long result = number1 + number2;
-                edtResult.setText(String.valueOf(result));
-                history += number1 + " + " + number2 + " = " + result;
-                tvHistory.setText(history);
-                history += '\n'; // ky tu xuong dong cho moi phep toan
-            }
+        btnSumNumber.setOnClickListener(v -> {
+            long number1 = Integer.parseInt(edtNumber1.getText().toString().trim());
+            long number2 = Integer.parseInt(edtNumber2.getText().toString().trim());
+            long result = number1 + number2;
+            edtResult.setText(String.valueOf(result));
+            history += number1 + " + " + number2 + " = " + result;
+            tvHistory.setText(history);
+            history += '\n'; // ky tu xuong dong cho moi phep toan
         });
-        btnClearData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                history = "";
-                tvHistory.setText(history);
-                edtNumber1.setText(history);
-                edtNumber2.setText(history);
-                edtResult.setText(history);
-            }
+        btnClearData.setOnClickListener(v -> {
+            history = "";
+            tvHistory.setText(history);
+            edtNumber1.setText(history);
+            edtNumber2.setText(history);
+            edtResult.setText(history);
         });
     }
 

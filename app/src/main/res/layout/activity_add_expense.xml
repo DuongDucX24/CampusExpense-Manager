@@ -27,7 +27,7 @@
         android:hint="Enter expense name"
         android:inputType="text"
         android:minHeight="48dp"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/edtExpenseAmount"
@@ -38,7 +38,7 @@
         android:hint="Enter expense amount"
         android:inputType="numberDecimal"
         android:minHeight="48dp"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/edtExpenseDescription"
@@ -49,7 +49,7 @@
         android:hint="Description"
         android:inputType="textMultiLine"
         android:minHeight="48dp"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,VisualLintTextFieldSize" />
 
     <Button
         android:id="@+id/btnSaveExpense"
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="Save"
-        tools:ignore="HardcodedText"
+        tools:ignore="HardcodedText,VisualLintButtonSize"
         android:background="#FFA500"/>
 
     <Button

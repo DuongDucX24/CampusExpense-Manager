@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
-    tools:ignore="HardcodedText">
+    tools:ignore="HardcodedText,VisualLintButtonSize">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,8 @@
         android:autofillHints="false"
         android:hint="Enter name's Budget "
         android:inputType="text"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/edtBudgetMoney"
@@ -34,7 +35,8 @@
         android:autofillHints="false"
         android:hint="Enter money's Budget "
         android:inputType="numberDecimal"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/edtDescription"
@@ -44,20 +46,26 @@
         android:autofillHints="false"
         android:hint="Descriptions"
         android:inputType="textMultiLine"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        tools:ignore="VisualLintTextFieldSize" />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFA500"
         android:text="Save"
         android:layout_marginTop="15dp"
-        android:id="@+id/btnSaveBudget"/>
+        android:id="@+id/btnSaveBudget"
+        tools:ignore="VisualLintButtonSize" />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Back"
         android:id="@+id/btnBackBudget"
+<<<<<<< Updated upstream
         android:layout_marginTop="15dp"
         android:background="#FFA500"
         tools:ignore="HardcodedText,VisualLintButtonSize"/>
+=======
+        tools:ignore="VisualLintButtonSize" />
+>>>>>>> Stashed changes
 </LinearLayout>

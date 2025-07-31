@@ -34,8 +34,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         toolbar = findViewById(R.id.toolbar);
         navigationView = findViewById(R.id.nav_view);
 
-        //getSupportActionBar(toolbar);
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open_drawer, R.string.close_drawer);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -45,15 +43,12 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         MenuItem itemLogout = menu.findItem(R.id.menu_logout);
 
         // xu ly logout
-        itemLogout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(@NonNull MenuItem item) {
-                drawerLayout.closeDrawer(GravityCompat.START);
-                Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-                return false;
-            }
+        itemLogout.setOnMenuItemClickListener(item -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return false;
         });
 
         // xu ly click vao tab bottom menu

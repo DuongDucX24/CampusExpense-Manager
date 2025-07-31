@@ -3,7 +3,6 @@ package com.example.se07101campusexpenses.budget;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -30,40 +29,33 @@ public class AddBudgetActivity extends AppCompatActivity {
         edtDescription = findViewById(R.id.edtDescription);
         repository = new BudgetRepository(AddBudgetActivity.this);
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String nameBudget = edtBudgetName.getText().toString().trim();
-                int moneyBudget = Integer.parseInt(edtBudgetMoney.getText().toString().trim());
-                String description = edtDescription.getText().toString().trim();
-                if (TextUtils.isEmpty(nameBudget)){
-                    edtBudgetName.setError("Enter name's budget, please");
-                    return;
-                }
-                if (moneyBudget <= 0){
-                    edtBudgetMoney.setError("Enter money's budget, please");
-                    return;
-                }
-                long insertBudget = repository.addNewBudget(nameBudget, moneyBudget, description);
-                if (insertBudget == -1){
-                    // loi
-                    Toast.makeText(AddBudgetActivity.this, "Can not create budget, please try again", Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    // thanh cong
-                    Toast.makeText(AddBudgetActivity.this, "Create budget successfully", Toast.LENGTH_SHORT).show();
-                    // Quay ve lai Menu activity
-                    Intent intent = new Intent(AddBudgetActivity.this, MenuActivity.class);
-                    startActivity(intent);
-                }
+        btnSave.setOnClickListener(v -> {
+            String nameBudget = edtBudgetName.getText().toString().trim();
+            int moneyBudget = Integer.parseInt(edtBudgetMoney.getText().toString().trim());
+            String description = edtDescription.getText().toString().trim();
+            if (TextUtils.isEmpty(nameBudget)){
+                edtBudgetName.setError("Enter name's budget, please");
+                return;
             }
-        });
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            if (moneyBudget <= 0){
+                edtBudgetMoney.setError("Enter money's budget, please");
+                return;
+            }
+            long insertBudget = repository.addNewBudget(nameBudget, moneyBudget, description);
+            if (insertBudget == -1){
+                // loi
+                Toast.makeText(AddBudgetActivity.this, "Can not create budget, please try again", Toast.LENGTH_SHORT).show();
+            } else {
+                // thanh cong
+                Toast.makeText(AddBudgetActivity.this, "Create budget successfully", Toast.LENGTH_SHORT).show();
+                // Quay ve lai Menu activity
                 Intent intent = new Intent(AddBudgetActivity.this, MenuActivity.class);
                 startActivity(intent);
             }
+        });
+        btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(AddBudgetActivity.this, MenuActivity.class);
+            startActivity(intent);
         });
     }
 }

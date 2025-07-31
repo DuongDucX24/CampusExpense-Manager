@@ -2,10 +2,8 @@ package com.example.se07101campusexpenses;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -36,57 +34,45 @@ public class TestEventActivity extends AppCompatActivity {
         edtData.setEnabled(false);
         btnClickMe.setEnabled(false);
 
-        btnGender.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // xac dinh xem chon gioi tinh nao?
-                int selectedId = radGender.getCheckedRadioButtonId();
-                RadioButton rad = (RadioButton) findViewById(selectedId);
-                if (rad == null){
-                    // nguoi dung chua chon gioi tinh
-                    Toast.makeText(TestEventActivity.this, "Choose Gender, please", Toast.LENGTH_SHORT).show();
-                } else {
-                    // da chon
-                    String gender = rad.getText().toString().trim();
-                    Toast.makeText(TestEventActivity.this, gender, Toast.LENGTH_SHORT).show();
-                }
+        btnGender.setOnClickListener(v -> {
+            // xac dinh xem chon gioi tinh nao?
+            int selectedId = radGender.getCheckedRadioButtonId();
+            RadioButton rad = findViewById(selectedId);
+            if (rad == null){
+                // nguoi dung chua chon gioi tinh
+                Toast.makeText(TestEventActivity.this, "Choose Gender, please", Toast.LENGTH_SHORT).show();
+            } else {
+                // da chon
+                String gender = rad.getText().toString().trim();
+                Toast.makeText(TestEventActivity.this, gender, Toast.LENGTH_SHORT).show();
             }
         });
 
-        cbAccept.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    edtData.setEnabled(true);
-                    btnClickMe.setEnabled(true);
-                } else {
-                    edtData.setEnabled(false);
-                    btnClickMe.setEnabled(false);
-                }
-            }
-        });
-
-        btnUnblock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // unblock
+        cbAccept.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked){
                 edtData.setEnabled(true);
                 btnClickMe.setEnabled(true);
+            } else {
+                edtData.setEnabled(false);
+                btnClickMe.setEnabled(false);
             }
+        });
+
+        btnUnblock.setOnClickListener(v -> {
+            // unblock
+            edtData.setEnabled(true);
+            btnClickMe.setEnabled(true);
         });
 
         // bat su kien khi click Button
-        btnClickMe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // lay du lieu nguoi dung nhap vao Edit Text
-                String data = edtData.getText().toString().trim();
-                if (TextUtils.isEmpty(data)){
-                    edtData.setError("Data can not empty");
-                    return;
-                }
-                Toast.makeText(TestEventActivity.this, data, Toast.LENGTH_LONG).show();
+        btnClickMe.setOnClickListener(v -> {
+            // lay du lieu nguoi dung nhap vao Edit Text
+            String data = edtData.getText().toString().trim();
+            if (TextUtils.isEmpty(data)){
+                edtData.setError("Data can not empty");
+                return;
             }
+            Toast.makeText(TestEventActivity.this, data, Toast.LENGTH_LONG).show();
         });
     }
 }
