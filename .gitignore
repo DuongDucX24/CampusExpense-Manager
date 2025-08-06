@@ -15,3 +15,4 @@
 local.properties
 .idea/studiobot.xml
 .idea/vcs.xml
+.idea/copilotDiffState.xml

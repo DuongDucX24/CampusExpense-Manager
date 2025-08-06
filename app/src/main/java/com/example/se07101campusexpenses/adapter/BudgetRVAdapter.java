@@ -39,8 +39,8 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     @Override
     public void onBindViewHolder(@NonNull BudgetRVAdapter.BudgetItemViewHolder holder, int position) {
         BudgetModel model = budgetModels.get(position);
-        holder.tvNameBudget.setText(model.getBudgetName());
-        holder.tvBudgetMoney.setText(String.valueOf(model.getBudgetMoney()));
+        holder.tvNameBudget.setText(model.getName());
+        holder.tvBudgetMoney.setText(String.valueOf(model.getAmount()));
         holder.itemView.setOnClickListener(view -> {
             if (clickListener != null){
                 clickListener.onClick(position);

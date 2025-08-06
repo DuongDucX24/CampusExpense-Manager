@@ -44,11 +44,10 @@ public class ExpenseReportAdapter extends RecyclerView.Adapter<ExpenseReportAdap
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvDescription = itemView.findViewById(R.id.tvDescription);
-            tvAmount = itemView.findViewById(R.id.tvAmount);
-            tvCategory = itemView.findViewById(R.id.tvCategory);
-            tvDate = itemView.findViewById(R.id.tvDate);
+            tvDescription = itemView.findViewById(R.id.tvExpenseDescription);
+            tvAmount = itemView.findViewById(R.id.tvExpenseAmount);
+            tvCategory = itemView.findViewById(R.id.tvExpenseCategory);
+            tvDate = itemView.findViewById(R.id.tvExpenseDate);
         }
     }
 }
-
