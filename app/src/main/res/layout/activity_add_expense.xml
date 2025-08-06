@@ -56,18 +56,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:background="#FFA500"
         android:text="Save"
-        tools:ignore="HardcodedText,VisualLintButtonSize"
-        android:background="#FFA500"/>
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     <Button
         android:id="@+id/btnBackExpense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Back"
-        tools:ignore="HardcodedText,VisualLintButtonSize"
+        android:layout_marginTop="15dp"
         android:background="#FFA500"
-        android:layout_marginTop="15dp"/>
+        android:text="Back"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
 
 </LinearLayout>
 
