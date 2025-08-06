@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#FFC107</color> <!-- Amber -->
+    <color name="colorPrimaryDark">#FFA000</color> <!-- Darker Amber -->
+    <color name="colorAccent">#03A9F4</color> <!-- Light Blue -->
+    <color name="colorDelete">#D32F2F</color> <!-- Dark Red -->
+    <color name="colorTextWhite">#FFFFFF</color> <!-- White -->
+    <color name="textColorPrimary">#212121</color> <!-- Almost Black -->
+    <color name="textColorSecondary">#757575</color> <!-- Medium Gray -->
+    <color name="colorBackground">#FAFAFA</color> <!-- Very Light Gray -->
+    <color name="colorButton">#FFC107</color> <!-- Amber -->
+    <color name="colorButtonText">#212121</color> <!-- Almost Black -->
 </resources>

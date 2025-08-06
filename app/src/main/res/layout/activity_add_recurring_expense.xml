@@ -3,51 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description" />
+        android:autofillHints="name"
+        android:hint="Description"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/etAmount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints=""
         android:hint="Amount"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/etCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category" />
+        android:autofillHints=""
+        android:hint="Category"
+        android:minHeight="48dp" />
 
     <Spinner
         android:id="@+id/spFrequency"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/frequencies" />
+        android:entries="@array/frequencies"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/etStartDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Start Date (YYYY-MM-DD)" />
+        android:autofillHints=""
+        android:hint="Start Date (YYYY-MM-DD)"
+        android:inputType="date"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/etEndDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="End Date (YYYY-MM-DD)" />
+        android:autofillHints=""
+        android:hint="End Date (YYYY-MM-DD)"
+        android:inputType="date"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:background="@color/colorButton"
+        android:textColor="@color/colorButtonText"
+        android:minHeight="48dp"
         android:text="Save" />
 
 </LinearLayout>
-

@@ -3,25 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/colorBackground">
 
     <EditText
         android:id="@+id/etStartDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Start Date (YYYY-MM-DD)" />
+        android:autofillHints=""
+        android:hint="Start Date (YYYY-MM-DD)"
+        android:inputType="date"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/etEndDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="End Date (YYYY-MM-DD)" />
+        android:autofillHints=""
+        android:hint="End Date (YYYY-MM-DD)"
+        android:inputType="date"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/btnGenerateReport"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:background="@color/colorButton"
+        android:textColor="@color/colorButtonText"
+        android:minHeight="48dp"
         android:text="Generate Report" />
 
     <TextView
@@ -30,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textSize="18sp"
+        android:textColor="@color/textColorPrimary"
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView

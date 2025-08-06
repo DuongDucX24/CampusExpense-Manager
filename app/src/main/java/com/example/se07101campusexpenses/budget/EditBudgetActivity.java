@@ -28,83 +28,51 @@ public class EditBudgetActivity extends AppCompatActivity {
 
         EditText edtBudgetName = findViewById(R.id.edtBudgetName);
         EditText edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
-        EditText edtBudgetPeriod = findViewById(R.id.edtDescription);
         Button btnSaveBudget = findViewById(R.id.btnSaveBudget);
         Button btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
         Button btnBackBudget = findViewById(R.id.btnBackBudget);
 
         budget = (Budget) getIntent().getSerializableExtra("budget");
         if (budget != null) {
-            edtBudgetName.setText(budget.getName());
+            edtBudgetName.setText(budget.getCategory());
             edtBudgetAmount.setText(String.valueOf(budget.getAmount()));
-            edtBudgetPeriod.setText(budget.getPeriod());
         }
 
-        btnSaveBudget.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String budgetName = edtBudgetName.getText().toString().trim();
-                String budgetAmountStr = edtBudgetAmount.getText().toString().trim();
-                String budgetPeriod = edtBudgetPeriod.getText().toString().trim();
+        btnSaveBudget.setOnClickListener(v -> {
+            String budgetName = edtBudgetName.getText().toString().trim();
+            String budgetAmountStr = edtBudgetAmount.getText().toString().trim();
 
-                if (TextUtils.isEmpty(budgetName) || TextUtils.isEmpty(budgetAmountStr) || TextUtils.isEmpty(budgetPeriod)) {
-                    Toast.makeText(EditBudgetActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (TextUtils.isEmpty(budgetName) || TextUtils.isEmpty(budgetAmountStr)) {
+                Toast.makeText(EditBudgetActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                double budgetAmount = Double.parseDouble(budgetAmountStr);
+            double budgetAmount = Double.parseDouble(budgetAmountStr);
 
+            budget.setCategory(budgetName);
+            budget.setAmount(budgetAmount);
+
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                budgetDao.update(budget);
+                runOnUiThread(() -> {
+                    Toast.makeText(EditBudgetActivity.this, "Budget updated successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            });
+        });
+
+        btnDeleteBudget.setOnClickListener(v -> {
+            if (budget != null) {
                 AppDatabase.databaseWriteExecutor.execute(() -> {
-                    if (budget == null) {
-                        // Add new budget
-                        Budget newBudget = new Budget();
-                        newBudget.setName(budgetName);
-                        newBudget.setAmount(budgetAmount);
-                        newBudget.setPeriod(budgetPeriod);
-                        budgetDao.insert(newBudget);
-                        runOnUiThread(() -> {
-                            Toast.makeText(EditBudgetActivity.this, "Budget saved successfully", Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
-                    } else {
-                        // Update existing budget
-                        budget.setName(budgetName);
-                        budget.setAmount(budgetAmount);
-                        budget.setPeriod(budgetPeriod);
-                        budgetDao.update(budget);
-                        runOnUiThread(() -> {
-                            Toast.makeText(EditBudgetActivity.this, "Budget updated successfully", Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
-                    }
+                    budgetDao.delete(budget);
+                    runOnUiThread(() -> {
+                        Toast.makeText(EditBudgetActivity.this, "Budget deleted", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
                 });
             }
         });
 
-        btnDeleteBudget.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppDatabase.databaseWriteExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        budgetDao.delete(budget);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(EditBudgetActivity.this, "Budget deleted", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        btnBackBudget.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        btnBackBudget.setOnClickListener(v -> finish());
     }
 }

@@ -9,9 +9,8 @@ import java.io.Serializable;
 public class Budget implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int id;
-    public String name;
+    public String category;
     public double amount;
-    public String period;
     public int userId;
 
     public int getId() {
@@ -22,12 +21,12 @@ public class Budget implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCategory() {
+        return category;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public double getAmount() {
@@ -36,14 +35,6 @@ public class Budget implements Serializable {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
     }
 
     public int getUserId() {

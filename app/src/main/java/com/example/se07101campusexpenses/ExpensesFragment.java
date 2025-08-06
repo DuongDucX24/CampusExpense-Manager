@@ -22,55 +22,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ExpensesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExpensesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private RecyclerView recyclerViewExpenses;
-    private FloatingActionButton fabAddExpense;
     private ExpenseDao expenseDao;
     private ExpenseAdapter expenseAdapter;
-    private List<Expense> expenseList = new ArrayList<>();
+    private final List<Expense> expenseList = new ArrayList<>();
     private int userId;
 
     public ExpensesFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExpensesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ExpensesFragment newInstance(String param1, String param2) {
-        ExpensesFragment fragment = new ExpensesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            // TODO: Rename and change types of parameters
-            String mParam1 = getArguments().getString(ARG_PARAM1);
-            String mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -84,8 +49,8 @@ public class ExpensesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerViewExpenses = view.findViewById(R.id.recyclerViewExpenses);
-        fabAddExpense = view.findViewById(R.id.fabAddExpense);
+        RecyclerView recyclerViewExpenses = view.findViewById(R.id.recyclerViewExpenses);
+        FloatingActionButton fabAddExpense = view.findViewById(R.id.fabAddExpense);
 
         userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
         expenseDao = AppDatabase.getInstance(getContext()).expenseDao();
@@ -118,7 +83,7 @@ public class ExpensesFragment extends Fragment {
             requireActivity().runOnUiThread(() -> {
                 expenseList.clear();
                 expenseList.addAll(expenses);
-                expenseAdapter.notifyDataSetChanged();
+                expenseAdapter.notifyItemRangeChanged(0, expenseList.size());
             });
         });
     }

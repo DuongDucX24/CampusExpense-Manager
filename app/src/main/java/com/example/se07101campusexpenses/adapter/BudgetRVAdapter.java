@@ -39,7 +39,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     @Override
     public void onBindViewHolder(@NonNull BudgetRVAdapter.BudgetItemViewHolder holder, int position) {
         Budget model = budgetModels.get(position);
-        holder.tvNameBudget.setText(model.name);
+        holder.tvNameBudget.setText(model.category);
         holder.tvBudgetMoney.setText(String.valueOf(model.amount));
         holder.itemView.setOnClickListener(view -> {
             if (clickListener != null){
@@ -60,7 +60,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
         TextView tvNameBudget, tvBudgetMoney;
         View itemView;
         public BudgetItemViewHolder(@NonNull View itemView) {
-            super(itemView.getRootView());
+            super(itemView);
             this.itemView = itemView;
             tvNameBudget = itemView.findViewById(R.id.tvNameBudget);
             tvBudgetMoney = itemView.findViewById(R.id.tvMoneyBudget);

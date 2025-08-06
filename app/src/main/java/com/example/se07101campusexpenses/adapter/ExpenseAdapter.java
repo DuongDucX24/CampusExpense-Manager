@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
-import com.example.se07101campusexpenses.database.Expense;
+import com.example.se07101campusexpenses.model.Expense;
 
 import java.util.List;
 
@@ -41,10 +41,10 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
         Expense currentExpense = expenseList.get(position);
-        holder.tvExpenseDescription.setText(currentExpense.getDescription());
-        holder.tvExpenseCategory.setText(currentExpense.getCategory());
-        holder.tvExpenseAmount.setText(String.format("Amount: $%.2f", currentExpense.getAmount()));
-        holder.tvExpenseDate.setText(currentExpense.getDate());
+        holder.tvExpenseDescription.setText(currentExpense.description);
+        holder.tvExpenseCategory.setText(currentExpense.category);
+        holder.tvExpenseAmount.setText(String.format("Amount: $%.2f", currentExpense.amount));
+        holder.tvExpenseDate.setText(currentExpense.date);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

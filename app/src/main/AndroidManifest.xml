@@ -18,10 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:targetApi="31">
-        <activity android:name=".LifeCycleSecondActivity"/>
-        <activity android:name=".TestLifeCycleActivity"/>
-        <activity android:name=".TestEventActivity"/>
-        <activity android:name=".TestComponentActivity"/>
         <activity android:name=".MenuActivity"/>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".RecurringExpenseActivity"/>

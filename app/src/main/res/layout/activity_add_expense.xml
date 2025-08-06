@@ -6,6 +6,7 @@
     android:autofillHints=""
     android:orientation="vertical"
     android:padding="10dp"
+    android:background="@color/colorBackground"
     tools:ignore="VisualLintButtonSize">
 
     <TextView
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Add Expense"
-        android:textColor="@android:color/black"
+        android:textColor="@color/textColorPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="HardcodedText" />
@@ -61,50 +62,15 @@
         android:minHeight="48dp"
         tools:ignore="VisualLintTextFieldSize" />
 
-    <CheckBox
-        android:id="@+id/chkRecurring"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Recurring Expense" />
-
-    <LinearLayout
-        android:id="@+id/layoutRecurringDates"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <EditText
-            android:id="@+id/edtRecurringStartDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:clickable="true"
-            android:focusable="false"
-            android:hint="Select start date"
-            android:inputType="date"
-            android:minHeight="48dp" />
-
-        <EditText
-            android:id="@+id/edtRecurringEndDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:clickable="true"
-            android:focusable="false"
-            android:hint="Select end date"
-            android:inputType="date"
-            android:minHeight="48dp" />
-    </LinearLayout>
-
     <Button
         android:id="@+id/btnSaveExpense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:background="#FFA500"
+        android:background="@color/colorButton"
+        android:textColor="@color/colorButtonText"
         android:text="Save"
+        android:minHeight="48dp"
         tools:ignore="HardcodedText,VisualLintButtonSize" />
 
     <Button
@@ -112,8 +78,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:background="#FFA500"
+        android:background="@color/colorButton"
+        android:textColor="@color/colorButtonText"
         android:text="Back"
+        android:minHeight="48dp"
         tools:ignore="HardcodedText,VisualLintButtonSize" />
 
 </LinearLayout>

@@ -15,8 +15,7 @@ import com.example.se07101campusexpenses.database.BudgetDao;
 import com.example.se07101campusexpenses.model.Budget;
 
 public class AddBudgetActivity extends AppCompatActivity {
-    private EditText edtBudgetName, edtBudgetAmount, edtBudgetPeriod;
-    private Button btnSaveBudget, btnBackBudget;
+    private EditText edtBudgetName, edtBudgetAmount;
     private BudgetDao budgetDao;
     private int userId;
 
@@ -25,21 +24,19 @@ public class AddBudgetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_budget);
 
+        edtBudgetName = findViewById(R.id.edtBudgetName);
+        edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
+        Button btnSaveBudget = findViewById(R.id.btnSaveBudget);
+        Button btnBackBudget = findViewById(R.id.btnBackBudget);
+
         budgetDao = AppDatabase.getInstance(this).budgetDao();
         userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
 
-        edtBudgetName  = findViewById(R.id.edtBudgetName);
-        edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
-        edtBudgetPeriod = findViewById(R.id.edtDescription); // Assuming this is for period
-        btnSaveBudget = findViewById(R.id.btnSaveBudget);
-        btnBackBudget = findViewById(R.id.btnBackBudget);
-
-        btnSaveBudget.setOnClickListener(view -> {
+        btnSaveBudget.setOnClickListener(v -> {
             String nameBudget = edtBudgetName.getText().toString().trim();
             String amountBudgetStr = edtBudgetAmount.getText().toString().trim();
-            String period = edtBudgetPeriod.getText().toString().trim();
 
-            if (TextUtils.isEmpty(nameBudget) || TextUtils.isEmpty(amountBudgetStr) || TextUtils.isEmpty(period)) {
+            if (TextUtils.isEmpty(nameBudget) || TextUtils.isEmpty(amountBudgetStr)) {
                 Toast.makeText(this, "Please enter all values", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -47,9 +44,8 @@ public class AddBudgetActivity extends AppCompatActivity {
             double amountBudget = Double.parseDouble(amountBudgetStr);
 
             Budget budget = new Budget();
-            budget.name = nameBudget;
+            budget.category = nameBudget;
             budget.amount = amountBudget;
-            budget.period = period;
             budget.userId = userId;
 
             AppDatabase.databaseWriteExecutor.execute(() -> {

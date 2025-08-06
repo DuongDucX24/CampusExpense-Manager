@@ -3,7 +3,6 @@ package com.example.se07101campusexpenses;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +22,6 @@ public class EditExpenseActivity extends AppCompatActivity {
 
     private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate;
     private Spinner spinnerExpenseCategory;
-    private Button btnSaveExpense, btnDeleteExpense, btnBackExpense;
 
     private ExpenseDao expenseDao;
     private Expense expense;
@@ -39,9 +37,9 @@ public class EditExpenseActivity extends AppCompatActivity {
         edtExpenseAmount = findViewById(R.id.edtExpenseAmount);
         edtExpenseDate = findViewById(R.id.edtExpenseDate);
         spinnerExpenseCategory = findViewById(R.id.spinnerExpenseCategory);
-        btnSaveExpense = findViewById(R.id.btnSaveExpense);
-        btnDeleteExpense = findViewById(R.id.btnDeleteExpense);
-        btnBackExpense = findViewById(R.id.btnBackExpense);
+        Button btnSaveExpense = findViewById(R.id.btnSaveExpense);
+        Button btnDeleteExpense = findViewById(R.id.btnDeleteExpense);
+        Button btnBackExpense = findViewById(R.id.btnBackExpense);
 
         // Category Spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
