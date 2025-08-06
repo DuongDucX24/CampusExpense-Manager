@@ -57,6 +57,14 @@
         android:id="@+id/btnSaveBudget"
         tools:ignore="VisualLintButtonSize" />
     <Button
+        android:id="@+id/btnDeleteBudget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="#FF0000"
+        android:text="Delete"
+        tools:ignore="HardcodedText,VisualLintButtonSize" />
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Back"

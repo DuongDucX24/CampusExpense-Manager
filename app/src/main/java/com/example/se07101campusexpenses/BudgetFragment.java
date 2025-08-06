@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,9 +24,8 @@ import java.util.List;
 
 public class BudgetFragment extends Fragment {
 
-    private RecyclerView budgetRv;
     private BudgetRVAdapter budgetRVAdapter;
-    private List<Budget> budgetList = new ArrayList<>();
+    private final List<Budget> budgetList = new ArrayList<>();
     private BudgetDao budgetDao;
     private int userId;
 
@@ -41,7 +39,7 @@ public class BudgetFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_budget, container, false);
         Button btnCreateBudget = view.findViewById(R.id.btnCreateBudget);
-        budgetRv = view.findViewById(R.id.rvBudget);
+        RecyclerView budgetRv = view.findViewById(R.id.rvBudget);
 
         userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
         budgetDao = AppDatabase.getInstance(getContext()).budgetDao();

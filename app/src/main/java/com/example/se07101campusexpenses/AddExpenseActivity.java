@@ -3,11 +3,9 @@ package com.example.se07101campusexpenses;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -24,7 +22,7 @@ import java.util.Calendar;
  *
  * <p>This activity provides a user interface for inputting expense details, including
  * description, amount, date, category, and whether it's a recurring expense.
- * It uses {@link ExpenseRepository} to interact with the database for saving expenses.
+ * It uses {@link ExpenseDao} to interact with the database for saving expenses.
  * </p>
  *
  * <p>Key features include:
@@ -102,11 +100,11 @@ public class AddExpenseActivity extends AppCompatActivity {
         double amount = Double.parseDouble(amountStr);
 
         Expense expense = new Expense();
-        expense.description = description;
-        expense.amount = amount;
-        expense.date = date;
-        expense.category = category;
-        expense.userId = userId;
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setDate(date);
+        expense.setCategory(category);
+        expense.setUserId(userId);
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
             expenseDao.insert(expense);
