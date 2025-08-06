@@ -7,30 +7,37 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 public class DbHelper extends SQLiteOpenHelper {
+    public static final String DB_NAME = "CampusExpense";
+    public static final int DB_VERSION = 2;
 
-    private static final String DB_NAME = "campus_expenses"; // ten csdl
-    private static final int DB_VERSION = 2; // phien ban
+    // Table User
+    public static final String DB_TABLE_USER = "user";
+    public static final String COL_USER_ID = "id";
+    public static final String COL_USER_USERNAME = "username";
+    public static final String COL_USER_PASSWORD = "password";
+    public static final String COL_USER_EMAIL = "email";
+    public static final String COL_USER_PHONE = "phone";
+    public static final String COL_USER_ROLE = "role";
+    public static final String COL_CREATED_AT = "created_at";
 
-    // khai bao bang du lieu va cac cot trong bang du lieu
-    // dinh nghia bang user
-    protected static final String DB_TABLE_USER = "user";
-    protected static final String COL_USER_ID = "id";
-    protected static final String COL_USER_USERNAME = "username";
-    protected static final String COL_USER_PASSWORD = "password";
-    protected static final String COL_USER_EMAIL = "email";
-    protected static final String COL_USER_PHONE = "phone";
-    protected static final String COL_USER_ROLE = "role";
+    // Table Budget
+    public static final String DB_TABLE_BUDGET = "budget";
+    public static final String COL_BUDGET_ID = "id";
+    public static final String COL_BUDGET_NAME = "name";
+    public static final String COL_BUDGET_AMOUNT = "amount";
+    public static final String COL_BUDGET_PERIOD = "period";
 
-    // dung chung cac bang - 2 truong nay
-    protected static final String COL_CREATED_AT = "created_at";
-    protected static final String COL_UPDATED_AT = "updated_at";
+    // Table Expenses
+    public static final String DB_TABLE_EXPENSES = "expenses";
+    public static final String COL_EXPENSE_ID = "id";
+    public static final String COL_EXPENSE_DESCRIPTION = "description";
+    public static final String COL_EXPENSE_AMOUNT = "amount";
+    public static final String COL_EXPENSE_DATE = "date";
+    public static final String COL_EXPENSE_CATEGORY = "category";
+    public static final String COL_EXPENSE_RECURRING = "recurring";
+    public static final String COL_EXPENSE_RECURRING_START_DATE = "recurring_start_date";
+    public static final String COL_EXPENSE_RECURRING_END_DATE = "recurring_end_date";
 
-    // dinh nghia bang budget
-    protected static final String DB_TABLE_BUDGET = "budget";
-    protected static final String COL_BUDGET_ID = "id";
-    protected static final String COL_BUDGET_NAME = "budget_name";
-    protected static final String COL_BUDGET_MONEY = "budget_money";
-    protected static final String COL_BUDGET_DESCRIPTION = "description";
 
     public DbHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -38,34 +45,65 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // tao bang user
-        String createUserTable = "CREATE TABLE " + DB_TABLE_USER + " ( "
-                                + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                                + COL_USER_USERNAME + " VARCHAR(60) NOT NULL, "
-                                + COL_USER_PASSWORD + " VARCHAR(200) NOT NULL, "
-                                + COL_USER_EMAIL + " VARCHAR(100) NOT NULL, "
-                                + COL_USER_PHONE + " VARCHAR(20), "
-                                + COL_USER_ROLE + " INTEGER DEFAULT(0), "
-                                + COL_CREATED_AT + " DATETIME, "
-                                + COL_UPDATED_AT + " DATETIME ) ";
-        // tao bang budget
-        String createBudgetTable = "CREATE TABLE " + DB_TABLE_BUDGET + " ( "
-                                   + COL_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                                   + COL_BUDGET_NAME + " VARCHAR(150) NOT NULL, "
-                                   + COL_BUDGET_MONEY + " INTEGER NOT NULL, "
-                                   + COL_BUDGET_DESCRIPTION + " TEXT, "
-                                   + COL_CREATED_AT + " DATETIME, "
-                                   + COL_UPDATED_AT + " DATETIME ) ";
-        db.execSQL(createUserTable);
-        db.execSQL(createBudgetTable);
+        // sql create table user
+        String sql_user = "CREATE TABLE " + DB_TABLE_USER + "(" +
+                COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_USER_USERNAME + " TEXT NOT NULL, " +
+                COL_USER_PASSWORD + " TEXT NOT NULL, " +
+                COL_USER_EMAIL + " TEXT NOT NULL, " +
+                COL_USER_PHONE + " TEXT NOT NULL, " +
+                COL_USER_ROLE + " INTEGER, " +
+                COL_CREATED_AT + " TEXT NOT NULL" +
+                ")";
+        db.execSQL(sql_user);
+
+        // sql create table budget
+        String sql_budget = "CREATE TABLE " + DB_TABLE_BUDGET + "(" +
+                COL_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_BUDGET_NAME + " TEXT NOT NULL, " +
+                COL_BUDGET_AMOUNT + " REAL NOT NULL, " +
+                COL_BUDGET_PERIOD + " TEXT NOT NULL" +
+                ")";
+        db.execSQL(sql_budget);
+
+        // sql create table expenses
+        String sql_expenses = "CREATE TABLE " + DB_TABLE_EXPENSES + "(" +
+                COL_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_EXPENSE_DESCRIPTION + " TEXT NOT NULL, " +
+                COL_EXPENSE_AMOUNT + " REAL NOT NULL, " +
+                COL_EXPENSE_DATE + " TEXT NOT NULL, " +
+                COL_EXPENSE_CATEGORY + " TEXT NOT NULL, " +
+                COL_EXPENSE_RECURRING + " INTEGER DEFAULT 0, " +
+                COL_EXPENSE_RECURRING_START_DATE + " TEXT, " +
+                COL_EXPENSE_RECURRING_END_DATE + " TEXT" +
+                ")";
+        db.execSQL(sql_expenses);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion != newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + DB_TABLE_USER); // xoa bang neu co loi
-            db.execSQL("DROP TABLE IF EXISTS " + DB_TABLE_BUDGET); // xoa bang budget
-            onCreate(db); // tao lai bang
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE " + DB_TABLE_USER + " ADD COLUMN " + COL_USER_PHONE + " TEXT NOT NULL DEFAULT ''");
+            db.execSQL("ALTER TABLE " + DB_TABLE_USER + " ADD COLUMN " + COL_USER_ROLE + " INTEGER DEFAULT 0");
+            db.execSQL("ALTER TABLE " + DB_TABLE_USER + " ADD COLUMN " + COL_CREATED_AT + " TEXT NOT NULL DEFAULT ''");
+            String sql_budget = "CREATE TABLE " + DB_TABLE_BUDGET + "(" +
+                    COL_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_BUDGET_NAME + " TEXT NOT NULL, " +
+                    COL_BUDGET_AMOUNT + " REAL NOT NULL, " +
+                    COL_BUDGET_PERIOD + " TEXT NOT NULL" +
+                    ")";
+            db.execSQL(sql_budget);
+            String sql_expenses = "CREATE TABLE " + DB_TABLE_EXPENSES + "(" +
+                    COL_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_EXPENSE_DESCRIPTION + " TEXT NOT NULL, " +
+                    COL_EXPENSE_AMOUNT + " REAL NOT NULL, " +
+                    COL_EXPENSE_DATE + " TEXT NOT NULL, " +
+                    COL_EXPENSE_CATEGORY + " TEXT NOT NULL, " +
+                    COL_EXPENSE_RECURRING + " INTEGER DEFAULT 0, " +
+                    COL_EXPENSE_RECURRING_START_DATE + " TEXT, " +
+                    COL_EXPENSE_RECURRING_END_DATE + " TEXT" +
+                    ")";
+            db.execSQL(sql_expenses);
         }
     }
 }

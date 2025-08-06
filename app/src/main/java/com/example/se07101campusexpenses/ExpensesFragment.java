@@ -1,11 +1,24 @@
 package com.example.se07101campusexpenses;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
+import com.example.se07101campusexpenses.database.Expense;
+import com.example.se07101campusexpenses.database.ExpenseRepository;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,6 +31,12 @@ public class ExpensesFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private RecyclerView recyclerViewExpenses;
+    private FloatingActionButton fabAddExpense;
+    private ExpenseRepository expenseRepository;
+    private ExpenseAdapter expenseAdapter;
+    private List<Expense> expenseList = new ArrayList<>();
 
     public ExpensesFragment() {
         // Required empty public constructor
@@ -56,5 +75,42 @@ public class ExpensesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_expenses, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        recyclerViewExpenses = view.findViewById(R.id.recyclerViewExpenses);
+        fabAddExpense = view.findViewById(R.id.fabAddExpense);
+
+        expenseRepository = new ExpenseRepository(getContext());
+
+        recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(getContext()));
+        expenseAdapter = new ExpenseAdapter(expenseList);
+        recyclerViewExpenses.setAdapter(expenseAdapter);
+
+        expenseAdapter.setOnItemClickListener(expense -> {
+            Intent intent = new Intent(getActivity(), EditExpenseActivity.class);
+            intent.putExtra("expense", expense);
+            startActivity(intent);
+        });
+
+        fabAddExpense.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AddExpenseActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadExpenses();
+    }
+
+    private void loadExpenses() {
+        expenseList.clear();
+        expenseList.addAll(expenseRepository.getAllExpenses());
+        expenseAdapter.notifyDataSetChanged();
     }
 }

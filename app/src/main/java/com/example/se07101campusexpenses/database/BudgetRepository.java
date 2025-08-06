@@ -8,55 +8,60 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
-public class BudgetRepository extends DbHelper{
+public class BudgetRepository extends DbHelper {
     public BudgetRepository(@Nullable Context context) {
         super(context);
     }
 
-    public long addNewBudget(String name, int money, String description){
-        @SuppressLint({"NewApi", "LocalSuppress"}) DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        @SuppressLint({"NewApi", "LocalSuppress"}) ZonedDateTime zone = ZonedDateTime.now();
-        @SuppressLint({"NewApi", "LocalSuppress"}) String currentDate = dtf.format(zone);
-        // lay ra ngay thang hien tai
+    public long addBudget(BudgetModel budget) {
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DbHelper.COL_BUDGET_NAME, name);
-        values.put(DbHelper.COL_BUDGET_MONEY, money);
-        values.put(DbHelper.COL_BUDGET_DESCRIPTION, description);
-        values.put(DbHelper.COL_CREATED_AT, currentDate);
-        SQLiteDatabase db = this.getWritableDatabase(); // ghi du lieu
-        long insert = db.insert(DbHelper.DB_TABLE_BUDGET, null, values);
+        values.put(DbHelper.COL_BUDGET_NAME, budget.getName());
+        values.put(DbHelper.COL_BUDGET_AMOUNT, budget.getAmount());
+        values.put(DbHelper.COL_BUDGET_PERIOD, budget.getPeriod());
+        long id = db.insert(DbHelper.DB_TABLE_BUDGET, null, values);
         db.close();
-        return insert;
+        return id;
+    }
+
+    public int updateBudget(BudgetModel budget) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DbHelper.COL_BUDGET_NAME, budget.getName());
+        values.put(DbHelper.COL_BUDGET_AMOUNT, budget.getAmount());
+        values.put(DbHelper.COL_BUDGET_PERIOD, budget.getPeriod());
+        return db.update(DbHelper.DB_TABLE_BUDGET, values, DbHelper.COL_BUDGET_ID + " = ?",
+                new String[]{String.valueOf(budget.getId())});
+    }
+
+    public void deleteBudget(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(DbHelper.DB_TABLE_BUDGET, DbHelper.COL_BUDGET_ID + " = ?",
+                new String[]{String.valueOf(id)});
+        db.close();
     }
 
     @SuppressLint("Range")
-    public ArrayList<BudgetModel> getListBudget(){
-        ArrayList<BudgetModel> budgetArrayList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase(); // doc du lieu
-        Cursor cursor = db.rawQuery("SELECT * FROM " + DbHelper.DB_TABLE_BUDGET, null);
-        if (cursor != null && cursor.getCount() > 0){
-            if (cursor.moveToFirst()){
-                do {
-                    // do du lieu vao model
-                    budgetArrayList.add(
-                        new BudgetModel(
-                            cursor.getInt(cursor.getColumnIndex(DbHelper.COL_BUDGET_ID)),
-                            cursor.getString(cursor.getColumnIndex(DbHelper.COL_BUDGET_NAME)),
-                            cursor.getInt(cursor.getColumnIndex(DbHelper.COL_BUDGET_MONEY)),
-                            cursor.getString(cursor.getColumnIndex(DbHelper.COL_BUDGET_DESCRIPTION)),
-                            cursor.getString(cursor.getColumnIndex(DbHelper.COL_CREATED_AT)),
-                            cursor.getString(cursor.getColumnIndex(DbHelper.COL_UPDATED_AT))
-                        )
-                    );
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
+    public List<BudgetModel> getAllBudgets() {
+        List<BudgetModel> budgets = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + DbHelper.DB_TABLE_BUDGET;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                BudgetModel budget = new BudgetModel();
+                budget.setId(cursor.getInt(cursor.getColumnIndex(DbHelper.COL_BUDGET_ID)));
+                budget.setName(cursor.getString(cursor.getColumnIndex(DbHelper.COL_BUDGET_NAME)));
+                budget.setAmount(cursor.getDouble(cursor.getColumnIndex(DbHelper.COL_BUDGET_AMOUNT)));
+                budget.setPeriod(cursor.getString(cursor.getColumnIndex(DbHelper.COL_BUDGET_PERIOD)));
+                budgets.add(budget);
+            } while (cursor.moveToNext());
         }
+        cursor.close();
         db.close();
-        return  budgetArrayList;
+        return budgets;
     }
 }

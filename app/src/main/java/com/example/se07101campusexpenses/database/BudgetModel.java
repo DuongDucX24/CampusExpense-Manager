@@ -1,20 +1,21 @@
 package com.example.se07101campusexpenses.database;
 
-public class BudgetModel {
-    private int id;
-    private String budgetName;
-    private int budgetMoney;
-    private String budgetDescription;
-    private String createdAt;
-    private String updatedAt;
+import java.io.Serializable;
 
-    public BudgetModel(int id, String budgetName, int budgetMoney, String budgetDescription, String createdAt, String updatedAt){
+public class BudgetModel implements Serializable {
+    private int id;
+    private String name;
+    private double amount;
+    private String period;
+
+    public BudgetModel() {
+    }
+
+    public BudgetModel(int id, String name, double amount, String period) {
         this.id = id;
-        this.budgetName = budgetName;
-        this.budgetMoney = budgetMoney;
-        this.budgetDescription = budgetDescription;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.name = name;
+        this.amount = amount;
+        this.period = period;
     }
 
     public int getId() {
@@ -25,43 +26,27 @@ public class BudgetModel {
         this.id = id;
     }
 
-    public String getBudgetName() {
-        return budgetName;
+    public String getName() {
+        return name;
     }
 
-    public void setBudgetName(String budgetName) {
-        this.budgetName = budgetName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public int getBudgetMoney() {
-        return budgetMoney;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setBudgetMoney(int budgetMoney) {
-        this.budgetMoney = budgetMoney;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
-    public String getBudgetDescription() {
-        return budgetDescription;
+    public String getPeriod() {
+        return period;
     }
 
-    public void setBudgetDescription(String budgetDescription) {
-        this.budgetDescription = budgetDescription;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setPeriod(String period) {
+        this.period = period;
     }
 }
