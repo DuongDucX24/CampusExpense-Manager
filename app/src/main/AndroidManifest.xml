@@ -24,6 +24,11 @@
         <activity android:name=".TestComponentActivity"/>
         <activity android:name=".MenuActivity"/>
         <activity android:name=".RegisterActivity"/>
+        <activity android:name=".RecurringExpenseActivity"/>
+        <activity android:name=".AddRecurringExpenseActivity"/>
+        <service android:name=".service.RecurringExpenseService" />
+        <service android:name=".service.NotificationService" />
+        <activity android:name=".ExpenseReportActivity"/>
         <activity android:name=".budget.AddBudgetActivity"/>
         <activity android:name=".budget.EditBudgetActivity"/>
         <activity android:name=".AddExpenseActivity"/>

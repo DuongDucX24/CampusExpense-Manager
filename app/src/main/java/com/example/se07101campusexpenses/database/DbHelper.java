@@ -38,6 +38,17 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String COL_EXPENSE_RECURRING_START_DATE = "recurring_start_date";
     public static final String COL_EXPENSE_RECURRING_END_DATE = "recurring_end_date";
 
+    // Table Recurring Expenses
+    public static final String DB_TABLE_RECURRING_EXPENSES = "recurring_expenses";
+    public static final String COL_RECURRING_EXPENSE_ID = "id";
+    public static final String COL_RECURRING_EXPENSE_DESCRIPTION = "description";
+    public static final String COL_RECURRING_EXPENSE_AMOUNT = "amount";
+    public static final String COL_RECURRING_EXPENSE_CATEGORY = "category";
+    public static final String COL_RECURRING_EXPENSE_FREQUENCY = "frequency";
+    public static final String COL_RECURRING_EXPENSE_START_DATE = "start_date";
+    public static final String COL_RECURRING_EXPENSE_END_DATE = "end_date";
+    public static final String COL_RECURRING_EXPENSE_USER_ID = "user_id";
+
 
     public DbHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -78,6 +89,19 @@ public class DbHelper extends SQLiteOpenHelper {
                 COL_EXPENSE_RECURRING_END_DATE + " TEXT" +
                 ")";
         db.execSQL(sql_expenses);
+
+        // sql create table recurring expenses
+        String sql_recurring_expenses = "CREATE TABLE " + DB_TABLE_RECURRING_EXPENSES + "(" +
+                COL_RECURRING_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_RECURRING_EXPENSE_DESCRIPTION + " TEXT NOT NULL, " +
+                COL_RECURRING_EXPENSE_AMOUNT + " REAL NOT NULL, " +
+                COL_RECURRING_EXPENSE_CATEGORY + " TEXT NOT NULL, " +
+                COL_RECURRING_EXPENSE_FREQUENCY + " TEXT NOT NULL, " +
+                COL_RECURRING_EXPENSE_START_DATE + " TEXT NOT NULL, " +
+                COL_RECURRING_EXPENSE_END_DATE + " TEXT NOT NULL, " +
+                COL_RECURRING_EXPENSE_USER_ID + " INTEGER NOT NULL" +
+                ")";
+        db.execSQL(sql_recurring_expenses);
     }
 
     @Override
@@ -104,6 +128,18 @@ public class DbHelper extends SQLiteOpenHelper {
                     COL_EXPENSE_RECURRING_END_DATE + " TEXT" +
                     ")";
             db.execSQL(sql_expenses);
+            // sql create table recurring expenses
+            String sql_recurring_expenses = "CREATE TABLE " + DB_TABLE_RECURRING_EXPENSES + "(" +
+                    COL_RECURRING_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_RECURRING_EXPENSE_DESCRIPTION + " TEXT NOT NULL, " +
+                    COL_RECURRING_EXPENSE_AMOUNT + " REAL NOT NULL, " +
+                    COL_RECURRING_EXPENSE_CATEGORY + " TEXT NOT NULL, " +
+                    COL_RECURRING_EXPENSE_FREQUENCY + " TEXT NOT NULL, " +
+                    COL_RECURRING_EXPENSE_START_DATE + " TEXT NOT NULL, " +
+                    COL_RECURRING_EXPENSE_END_DATE + " TEXT NOT NULL, " +
+                    COL_RECURRING_EXPENSE_USER_ID + " INTEGER NOT NULL" +
+                    ")";
+            db.execSQL(sql_recurring_expenses);
         }
     }
 }

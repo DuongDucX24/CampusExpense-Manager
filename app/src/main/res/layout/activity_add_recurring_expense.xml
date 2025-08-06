@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description" />
+
+    <EditText
+        android:id="@+id/etAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/etCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category" />
+
+    <Spinner
+        android:id="@+id/spFrequency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/frequencies" />
+
+    <EditText
+        android:id="@+id/etStartDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start Date (YYYY-MM-DD)" />
+
+    <EditText
+        android:id="@+id/etEndDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="End Date (YYYY-MM-DD)" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Save" />
+
+</LinearLayout>
+

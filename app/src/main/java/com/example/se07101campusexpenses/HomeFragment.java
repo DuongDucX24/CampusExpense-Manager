@@ -4,8 +4,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.example.se07101campusexpenses.database.BudgetRepository;
+import com.example.se07101campusexpenses.database.Expense;
+import com.example.se07101campusexpenses.database.ExpenseRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,41 +30,14 @@ import androidx.fragment.app.Fragment;
  */
 public class HomeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private TextView tvTotalSpending, tvRemainingBudget;
+    private LineChart chart;
+    private PieChart pieChart;
+    private ExpenseRepository expenseRepository;
+    private BudgetRepository budgetRepository;
 
     public HomeFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            // TODO: Rename and change types of parameters
-            String mParam1 = getArguments().getString(ARG_PARAM1);
-            String mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -56,5 +45,59 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        tvTotalSpending = view.findViewById(R.id.tvTotalSpending);
+        tvRemainingBudget = view.findViewById(R.id.tvRemainingBudget);
+        chart = view.findViewById(R.id.chart);
+        pieChart = view.findViewById(R.id.pieChart);
+
+        expenseRepository = new ExpenseRepository(requireContext());
+        budgetRepository = new BudgetRepository(requireActivity().getApplication());
+
+        updateSummary();
+        setupChart();
+        setupPieChart();
+    }
+
+    private void updateSummary() {
+        double totalSpending = expenseRepository.getTotalExpenses();
+        double totalBudget = budgetRepository.getTotalBudget();
+        double remainingBudget = totalBudget - totalSpending;
+
+        tvTotalSpending.setText(String.format(Locale.US, "Total Spending: $%.2f", totalSpending));
+        tvRemainingBudget.setText(String.format(Locale.US, "Remaining Budget: $%.2f", remainingBudget));
+    }
+
+    private void setupChart() {
+        List<Entry> entries = new ArrayList<>();
+        List<Expense> expenses = expenseRepository.getAllExpenses();
+        // Simple example: chart of expense amounts over time (index)
+        for (int i = 0; i < expenses.size(); i++) {
+            entries.add(new Entry(i, (float) expenses.get(i).getAmount()));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Expense Trend");
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate(); // refresh
+    }
+
+    private void setupPieChart() {
+        List<PieEntry> entries = new ArrayList<>();
+        List<Expense> expenses = expenseRepository.getExpensesByCategory();
+
+        for (Expense expense : expenses) {
+            entries.add(new PieEntry((float) expense.getAmount(), expense.getCategory()));
+        }
+
+        PieDataSet dataSet = new PieDataSet(entries, "Expenses by Category");
+        PieData pieData = new PieData(dataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate(); // refresh
     }
 }

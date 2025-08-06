@@ -5,13 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeFragment"
-    android:gravity="center">
-    <!-- TODO: Update blank fragment layout -->
+    android:padding="16dp">
+
     <TextView
+        android:id="@+id/tvTotalSpending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home page"
-        android:textSize="20sp"
+        android:text="Total Spending: $0.00"
+        android:textSize="18sp"
         android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tvRemainingBudget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remaining Budget: $0.00"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"/>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>

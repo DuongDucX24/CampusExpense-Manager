@@ -26,7 +26,6 @@ public class AddExpenseActivity extends AppCompatActivity {
     private Spinner spinnerExpenseCategory;
     private CheckBox chkRecurring;
     private LinearLayout layoutRecurringDates;
-    private Button btnSaveExpense, btnBackExpense;
 
     private ExpenseRepository expenseRepository;
 
@@ -45,8 +44,8 @@ public class AddExpenseActivity extends AppCompatActivity {
         layoutRecurringDates = findViewById(R.id.layoutRecurringDates);
         edtRecurringStartDate = findViewById(R.id.edtRecurringStartDate);
         edtRecurringEndDate = findViewById(R.id.edtRecurringEndDate);
-        btnSaveExpense = findViewById(R.id.btnSaveExpense);
-        btnBackExpense = findViewById(R.id.btnBackExpense);
+        Button btnSaveExpense = findViewById(R.id.btnSaveExpense);
+        Button btnBackExpense = findViewById(R.id.btnBackExpense);
 
         // Category Spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
