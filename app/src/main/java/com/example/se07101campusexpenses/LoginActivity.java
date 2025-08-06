@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -11,13 +12,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.se07101campusexpenses.database.UserModel;
-import com.example.se07101campusexpenses.database.UserRepository;
+import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.model.User;
+import com.example.se07101campusexpenses.model.UserDao;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtUsername, edtPassword;
     Button btnLogin;
-    UserRepository repository;
+    private UserDao userDao;
     TextView tvRegister;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername = findViewById(R.id.edtUsername);
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegisterAccount);
-        repository = new UserRepository(LoginActivity.this);
+        userDao = AppDatabase.getInstance(this).userDao();
         checkUserLogin();
 
         tvRegister.setOnClickListener(v -> {
@@ -47,18 +49,26 @@ public class LoginActivity extends AppCompatActivity {
                 edtPassword.setError("Enter password");
                 return;
             }
-            // kiem tra tai khoan co ton tai trong database hay ko?
-            UserModel user = repository.getInfoUserByUsername(username, password);
-            assert  user != null;
-            if (user.getId() > 0 && user.getUsername() != null ){
-                // dang nhap thanh cong
-                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                // dang nhap that bai
-                Toast.makeText(LoginActivity.this, "Account invalid", Toast.LENGTH_SHORT).show();
-            }
+
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                User user = userDao.login(username, password);
+                runOnUiThread(() -> {
+                    if (user != null) {
+                        // Save user ID to SharedPreferences
+                        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("user_id", user.id);
+                        editor.apply();
+
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
         });
     }
 }

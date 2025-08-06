@@ -1,6 +1,5 @@
 package com.example.se07101campusexpenses.budget;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -10,44 +9,58 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.se07101campusexpenses.MenuActivity;
 import com.example.se07101campusexpenses.R;
-import com.example.se07101campusexpenses.database.BudgetRepository;
+import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.BudgetDao;
 import com.example.se07101campusexpenses.model.Budget;
 
 public class AddBudgetActivity extends AppCompatActivity {
-    EditText edtBudgetName, edtBudgetMoney, edtDescription;
-    Button btnSaveBudget, btnBackBudget;
-    BudgetRepository repository;
+    private EditText edtBudgetName, edtBudgetAmount, edtBudgetPeriod;
+    private Button btnSaveBudget, btnBackBudget;
+    private BudgetDao budgetDao;
+    private int userId;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_budget);
+
+        budgetDao = AppDatabase.getInstance(this).budgetDao();
+        userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
+
         edtBudgetName  = findViewById(R.id.edtBudgetName);
-        edtBudgetMoney = findViewById(R.id.edtBudgetMoney);
-        edtDescription = findViewById(R.id.edtDescription);
+        edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
+        edtBudgetPeriod = findViewById(R.id.edtDescription); // Assuming this is for period
         btnSaveBudget = findViewById(R.id.btnSaveBudget);
         btnBackBudget = findViewById(R.id.btnBackBudget);
-        repository = new BudgetRepository(getApplication());
+
         btnSaveBudget.setOnClickListener(view -> {
-            String nameBudget = edtBudgetName.getText().toString();
-            String moneyBudgetStr = edtBudgetMoney.getText().toString();
-            String description = edtDescription.getText().toString();
-            if (nameBudget.isEmpty() || moneyBudgetStr.isEmpty()){
+            String nameBudget = edtBudgetName.getText().toString().trim();
+            String amountBudgetStr = edtBudgetAmount.getText().toString().trim();
+            String period = edtBudgetPeriod.getText().toString().trim();
+
+            if (TextUtils.isEmpty(nameBudget) || TextUtils.isEmpty(amountBudgetStr) || TextUtils.isEmpty(period)) {
                 Toast.makeText(this, "Please enter all values", Toast.LENGTH_SHORT).show();
                 return;
             }
-            double moneyBudget = Double.parseDouble(moneyBudgetStr);
+
+            double amountBudget = Double.parseDouble(amountBudgetStr);
+
             Budget budget = new Budget();
             budget.name = nameBudget;
-            budget.amount = moneyBudget;
-            budget.period = description; // Assuming description is used as period
-            repository.insert(budget);
-            Toast.makeText(this, "Add budget successfully", Toast.LENGTH_SHORT).show();
-            finish();
+            budget.amount = amountBudget;
+            budget.period = period;
+            budget.userId = userId;
+
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                budgetDao.insert(budget);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Add budget successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            });
         });
-        btnBackBudget.setOnClickListener(view -> {
-            finish();
-        });
+
+        btnBackBudget.setOnClickListener(view -> finish());
     }
 }

@@ -11,34 +11,31 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.se07101campusexpenses.database.UserRepository;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.model.User;
+import com.example.se07101campusexpenses.model.UserDao;
 
 public class RegisterActivity extends AppCompatActivity {
-    EditText edtUsername, edtPassword, edtMail, edtPhone;
+    EditText edtUsername, edtPassword;
     Button btnSignUp;
-    UserRepository repository;
+    private UserDao userDao;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        repository = new UserRepository(RegisterActivity.this);
+        userDao = AppDatabase.getInstance(this).userDao();
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
-        edtMail = findViewById(R.id.edtMail);
-        edtPhone = findViewById(R.id.edtPhone);
         btnSignUp = findViewById(R.id.btnSignUp);
-        registerUserAccount(); // saving account user to database !
+        registerUserAccount();
     }
+
     private void registerUserAccount(){
         btnSignUp.setOnClickListener(v -> {
-            // su kien dang ky tai khoan cua nguoi dung
-            String user = edtUsername.getText().toString().trim();
-            if (TextUtils.isEmpty(user)){
+            String username = edtUsername.getText().toString().trim();
+            if (TextUtils.isEmpty(username)){
                 edtUsername.setError("Enter username, please !");
                 return;
             }
@@ -47,54 +44,24 @@ public class RegisterActivity extends AppCompatActivity {
                 edtPassword.setError("Enter password, please !");
                 return;
             }
-            String email = edtMail.getText().toString().trim();
-            if (TextUtils.isEmpty(email)){
-                edtMail.setError("Enter your email, please !");
-                return;
-            }
-            String phone = edtPhone.getText().toString().trim();
-            // save account to database
-            long insert = repository.saveUserAccount(user, password, email, phone);
-            if (insert == -1) {
-                // Fail
-                Toast.makeText(RegisterActivity.this, "Save account fail", Toast.LENGTH_SHORT).show();
-            } else {
-                // Success
-                Toast.makeText(RegisterActivity.this, "Save account Successfully", Toast.LENGTH_SHORT).show();
-                // quay ve trang dang nhap
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-    private void signUpAccount(){
-        btnSignUp.setOnClickListener(v -> {
-            String user = edtUsername.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
-            if (TextUtils.isEmpty(user)){
-                edtUsername.setError("Username can not empty");
-                return;
-            }
-            if (TextUtils.isEmpty(password)){
-                edtPassword.setError("Password can not empty");
-                return;
-            }
-            // save data to file
-            FileOutputStream fileOutput;
-            try {
-                user = user + "|";
-                fileOutput = openFileOutput("user.txt", Context.MODE_APPEND);
-                fileOutput.write(user.getBytes(StandardCharsets.UTF_8));
-                fileOutput.write(password.getBytes(StandardCharsets.UTF_8));
-                fileOutput.write('\n');
-                fileOutput.close();
-                edtUsername.setText("");
-                edtPassword.setText("");
-                Toast.makeText(RegisterActivity.this, "Sign up account successfully", Toast.LENGTH_SHORT).show();
 
-            } catch (RuntimeException | IOException e) {
-                throw new RuntimeException(e);
-            }
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                User existingUser = userDao.getUserByUsername(username);
+                if (existingUser != null) {
+                    runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                } else {
+                    User newUser = new User();
+                    newUser.username = username;
+                    newUser.password = password; // In a real app, hash the password
+                    userDao.insert(newUser);
+                    runOnUiThread(() -> {
+                        Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    });
+                }
+            });
         });
     }
 }

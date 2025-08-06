@@ -10,12 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
-import com.example.se07101campusexpenses.database.BudgetModel;
+import com.example.se07101campusexpenses.model.Budget;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.BudgetItemViewHolder> {
-    public ArrayList<BudgetModel> budgetModels;
+    private List<Budget> budgetModels;
     public Context context;
     public OnClickListener clickListener;
     public interface OnClickListener {
@@ -24,7 +24,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     public void setOnClickListener(OnClickListener clickListener){
         this.clickListener = clickListener;
     }
-    public BudgetRVAdapter(ArrayList<BudgetModel> model, Context context){
+    public BudgetRVAdapter(List<Budget> model, Context context){
         this.budgetModels = model;
         this.context = context;
     }
@@ -38,9 +38,9 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
 
     @Override
     public void onBindViewHolder(@NonNull BudgetRVAdapter.BudgetItemViewHolder holder, int position) {
-        BudgetModel model = budgetModels.get(position);
-        holder.tvNameBudget.setText(model.getName());
-        holder.tvBudgetMoney.setText(String.valueOf(model.getAmount()));
+        Budget model = budgetModels.get(position);
+        holder.tvNameBudget.setText(model.name);
+        holder.tvBudgetMoney.setText(String.valueOf(model.amount));
         holder.itemView.setOnClickListener(view -> {
             if (clickListener != null){
                 clickListener.onClick(position);
@@ -50,7 +50,10 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
 
     @Override
     public int getItemCount() {
-        return budgetModels.size(); // so luong pham list view
+        if (budgetModels != null) {
+            return budgetModels.size();
+        }
+        return 0;
     }
 
     public class BudgetItemViewHolder extends RecyclerView.ViewHolder{
@@ -67,5 +70,10 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
                 }
             });
         }
+    }
+
+    public void setBudgets(List<Budget> budgets) {
+        this.budgetModels = budgets;
+        notifyDataSetChanged();
     }
 }

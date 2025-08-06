@@ -6,29 +6,26 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.se07101campusexpenses.database.Expense;
-import com.example.se07101campusexpenses.database.ExpenseRepository;
+import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.model.Expense;
+import com.example.se07101campusexpenses.model.ExpenseDao;
 
 import java.util.Arrays;
 import java.util.Calendar;
 
 public class EditExpenseActivity extends AppCompatActivity {
 
-    private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate, edtRecurringStartDate, edtRecurringEndDate;
+    private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate;
     private Spinner spinnerExpenseCategory;
-    private CheckBox chkRecurring;
-    private LinearLayout layoutRecurringDates;
     private Button btnSaveExpense, btnDeleteExpense, btnBackExpense;
 
-    private ExpenseRepository expenseRepository;
+    private ExpenseDao expenseDao;
     private Expense expense;
 
     @Override
@@ -36,16 +33,12 @@ public class EditExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_expense);
 
-        expenseRepository = new ExpenseRepository(this);
+        expenseDao = AppDatabase.getInstance(this).expenseDao();
 
         edtExpenseDescription = findViewById(R.id.edtExpenseDescription);
         edtExpenseAmount = findViewById(R.id.edtExpenseAmount);
         edtExpenseDate = findViewById(R.id.edtExpenseDate);
         spinnerExpenseCategory = findViewById(R.id.spinnerExpenseCategory);
-        chkRecurring = findViewById(R.id.chkRecurring);
-        layoutRecurringDates = findViewById(R.id.layoutRecurringDates);
-        edtRecurringStartDate = findViewById(R.id.edtRecurringStartDate);
-        edtRecurringEndDate = findViewById(R.id.edtRecurringEndDate);
         btnSaveExpense = findViewById(R.id.btnSaveExpense);
         btnDeleteExpense = findViewById(R.id.btnDeleteExpense);
         btnBackExpense = findViewById(R.id.btnBackExpense);
@@ -58,17 +51,6 @@ public class EditExpenseActivity extends AppCompatActivity {
 
         // Date Pickers
         edtExpenseDate.setOnClickListener(v -> showDatePickerDialog(edtExpenseDate));
-        edtRecurringStartDate.setOnClickListener(v -> showDatePickerDialog(edtRecurringStartDate));
-        edtRecurringEndDate.setOnClickListener(v -> showDatePickerDialog(edtRecurringEndDate));
-
-        // Recurring Expense Checkbox
-        chkRecurring.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                layoutRecurringDates.setVisibility(View.VISIBLE);
-            } else {
-                layoutRecurringDates.setVisibility(View.GONE);
-            }
-        });
 
         // Get expense from intent
         expense = (Expense) getIntent().getSerializableExtra("expense");
@@ -82,17 +64,11 @@ public class EditExpenseActivity extends AppCompatActivity {
     }
 
     private void populateFields() {
-        edtExpenseDescription.setText(expense.getDescription());
-        edtExpenseAmount.setText(String.valueOf(expense.getAmount()));
-        edtExpenseDate.setText(expense.getDate());
+        edtExpenseDescription.setText(expense.description);
+        edtExpenseAmount.setText(String.valueOf(expense.amount));
+        edtExpenseDate.setText(expense.date);
         String[] categories = getResources().getStringArray(R.array.expense_categories);
-        spinnerExpenseCategory.setSelection(Arrays.asList(categories).indexOf(expense.getCategory()));
-        chkRecurring.setChecked(expense.isRecurring());
-        if (expense.isRecurring()) {
-            layoutRecurringDates.setVisibility(View.VISIBLE);
-            edtRecurringStartDate.setText(expense.getRecurringStartDate());
-            edtRecurringEndDate.setText(expense.getRecurringEndDate());
-        }
+        spinnerExpenseCategory.setSelection(Arrays.asList(categories).indexOf(expense.category));
     }
 
     private void showDatePickerDialog(final EditText editText) {
@@ -114,9 +90,6 @@ public class EditExpenseActivity extends AppCompatActivity {
         String amountStr = edtExpenseAmount.getText().toString().trim();
         String date = edtExpenseDate.getText().toString().trim();
         String category = spinnerExpenseCategory.getSelectedItem().toString();
-        boolean isRecurring = chkRecurring.isChecked();
-        String recurringStartDate = edtRecurringStartDate.getText().toString().trim();
-        String recurringEndDate = edtRecurringEndDate.getText().toString().trim();
 
         if (TextUtils.isEmpty(description) || TextUtils.isEmpty(amountStr) || TextUtils.isEmpty(date)) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
@@ -125,28 +98,27 @@ public class EditExpenseActivity extends AppCompatActivity {
 
         double amount = Double.parseDouble(amountStr);
 
-        expense.setDescription(description);
-        expense.setAmount(amount);
-        expense.setDate(date);
-        expense.setCategory(category);
-        expense.setRecurring(isRecurring);
-        if (isRecurring) {
-            expense.setRecurringStartDate(recurringStartDate);
-            expense.setRecurringEndDate(recurringEndDate);
-        }
+        expense.description = description;
+        expense.amount = amount;
+        expense.date = date;
+        expense.category = category;
 
-        int rows = expenseRepository.updateExpense(expense);
-        if (rows > 0) {
-            Toast.makeText(this, "Expense updated successfully", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            Toast.makeText(this, "Failed to update expense", Toast.LENGTH_SHORT).show();
-        }
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            expenseDao.update(expense);
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Expense updated", Toast.LENGTH_SHORT).show();
+                finish();
+            });
+        });
     }
 
     private void deleteExpense() {
-        expenseRepository.deleteExpense(expense.getId());
-        Toast.makeText(this, "Expense deleted successfully", Toast.LENGTH_SHORT).show();
-        finish();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            expenseDao.delete(expense);
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Expense deleted", Toast.LENGTH_SHORT).show();
+                finish();
+            });
+        });
     }
 }

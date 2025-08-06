@@ -1,5 +1,6 @@
 package com.example.se07101campusexpenses;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,8 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
-import com.example.se07101campusexpenses.database.Expense;
-import com.example.se07101campusexpenses.database.ExpenseRepository;
+import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.model.Expense;
+import com.example.se07101campusexpenses.model.ExpenseDao;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -34,9 +36,10 @@ public class ExpensesFragment extends Fragment {
 
     private RecyclerView recyclerViewExpenses;
     private FloatingActionButton fabAddExpense;
-    private ExpenseRepository expenseRepository;
+    private ExpenseDao expenseDao;
     private ExpenseAdapter expenseAdapter;
     private List<Expense> expenseList = new ArrayList<>();
+    private int userId;
 
     public ExpensesFragment() {
         // Required empty public constructor
@@ -84,7 +87,8 @@ public class ExpensesFragment extends Fragment {
         recyclerViewExpenses = view.findViewById(R.id.recyclerViewExpenses);
         fabAddExpense = view.findViewById(R.id.fabAddExpense);
 
-        expenseRepository = new ExpenseRepository(getContext());
+        userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
+        expenseDao = AppDatabase.getInstance(getContext()).expenseDao();
 
         recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(getContext()));
         expenseAdapter = new ExpenseAdapter(expenseList);
@@ -109,8 +113,13 @@ public class ExpensesFragment extends Fragment {
     }
 
     private void loadExpenses() {
-        expenseList.clear();
-        expenseList.addAll(expenseRepository.getAllExpenses());
-        expenseAdapter.notifyDataSetChanged();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Expense> expenses = expenseDao.getExpensesByUserId(userId);
+            requireActivity().runOnUiThread(() -> {
+                expenseList.clear();
+                expenseList.addAll(expenses);
+                expenseAdapter.notifyDataSetChanged();
+            });
+        });
     }
 }
