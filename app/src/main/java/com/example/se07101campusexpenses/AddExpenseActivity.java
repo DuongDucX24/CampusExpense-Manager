@@ -20,6 +20,26 @@ import com.example.se07101campusexpenses.database.ExpenseRepository;
 
 import java.util.Calendar;
 
+/**
+ * Activity for adding a new expense.
+ *
+ * <p>This activity provides a user interface for inputting expense details, including
+ * description, amount, date, category, and whether it's a recurring expense.
+ * It uses {@link ExpenseRepository} to interact with the database for saving expenses.
+ * </p>
+ *
+ * <p>Key features include:
+ * <ul>
+ *     <li>Input fields for expense description, amount, and date.</li>
+ *     <li>A spinner for selecting the expense category.</li>
+ *     <li>A checkbox to indicate if the expense is recurring.</li>
+ *     <li>Conditional visibility for recurring start and end date pickers.</li>
+ *     <li>Date pickers for selecting dates.</li>
+ *     <li>Validation to ensure all required fields are filled.</li>
+ *     <li>Saving the expense to the database.</li>
+ * </ul>
+ * </p>
+ */
 public class AddExpenseActivity extends AppCompatActivity {
 
     private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate, edtRecurringStartDate, edtRecurringEndDate;

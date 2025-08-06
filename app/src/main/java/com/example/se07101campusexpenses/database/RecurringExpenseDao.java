@@ -13,5 +13,7 @@ public interface RecurringExpenseDao {
 
     @Query("SELECT * FROM recurring_expenses WHERE userId = :userId")
     List<RecurringExpense> getRecurringExpensesByUser(int userId);
-}
 
+    @Query("SELECT * FROM recurring_expenses")
+    List<RecurringExpense> getAllRecurringExpenses();
+}

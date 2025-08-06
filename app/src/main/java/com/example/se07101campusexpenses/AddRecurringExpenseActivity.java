@@ -11,6 +11,13 @@ import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.RecurringExpenseDao;
 import com.example.se07101campusexpenses.model.RecurringExpense;
 
+/**
+ * Activity for adding a new recurring expense.
+ *
+ * <p>This activity provides a user interface for inputting the details of a recurring expense,
+ * such as description, amount, category, frequency, start date, and end date.
+ * Upon saving, the new recurring expense is persisted to the local database.
+ */
 public class AddRecurringExpenseActivity extends AppCompatActivity {
 
     private EditText etDescription, etAmount, etCategory, etStartDate, etEndDate;

@@ -75,9 +75,9 @@ public class BudgetFragment extends Fragment {
         RecyclerView budgetRv = view.findViewById(R.id.rvBudget);
 
         budgetModelArrayList = new ArrayList<>();
-        try (BudgetRepository budgetRepository = new BudgetRepository(getActivity())) {
-            budgetModelArrayList = budgetRepository.getListBudget();
-        }
+        BudgetRepository budgetRepository = new BudgetRepository(requireActivity().getApplication());
+        budgetModelArrayList = (ArrayList<BudgetModel>) budgetRepository.getAllBudgets();
+
         BudgetRVAdapter budgetRVAdapter = new BudgetRVAdapter(budgetModelArrayList, getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
         budgetRv.setLayoutManager(linearLayoutManager);
@@ -85,10 +85,10 @@ public class BudgetFragment extends Fragment {
 
         budgetRVAdapter.setOnClickListener(position -> {
             BudgetModel model = budgetModelArrayList.get(position);
-            String name = model.getBudgetName();
-            int money = model.getBudgetMoney();
+            String name = model.getName();
+            double money = model.getAmount();
             int id = model.getId();
-            String description = model.getBudgetDescription();
+            // String description = model.getBudgetDescription(); // BudgetModel does not have a description
             // dung Intent + Bundle de truyen data sang EditBudget
             Toast.makeText(getActivity(), name, Toast.LENGTH_SHORT).show();
         });

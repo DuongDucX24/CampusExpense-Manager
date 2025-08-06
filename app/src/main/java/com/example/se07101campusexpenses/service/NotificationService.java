@@ -41,8 +41,8 @@ public class NotificationService extends Service {
     }
 
     private void checkBudgets() {
-        List<com.example.se07101campusexpenses.database.BudgetModel> budgets = budgetRepository.getAllBudgets();
-        for (com.example.se07101campusexpenses.database.BudgetModel budget : budgets) {
+        List<Budget> budgets = budgetRepository.getAllBudgets();
+        for (Budget budget : budgets) {
             double totalExpenses = expenseRepository.getTotalExpensesForCategory(budget.getName());
             if (totalExpenses >= budget.getAmount()) {
                 sendNotification("Budget Exceeded", "You have exceeded your budget for " + budget.getName());

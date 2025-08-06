@@ -14,5 +14,9 @@
         <item>Education</item>
         <item>Other</item>
     </string-array>
+    <string-array name="frequencies">
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
     <string name="date_range">%1$s to %2$s</string>
 </resources>
