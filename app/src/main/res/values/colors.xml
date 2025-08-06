@@ -9,5 +9,7 @@
     <color name="textColorSecondary">#757575</color> <!-- Medium Gray -->
     <color name="colorBackground">#FAFAFA</color> <!-- Very Light Gray -->
     <color name="colorButton">#FFC107</color> <!-- Amber -->
-    <color name="colorButtonText">#212121</color> <!-- Almost Black -->
+    <color name="colorButtonText">#212121</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color> <!-- Almost Black -->
 </resources>

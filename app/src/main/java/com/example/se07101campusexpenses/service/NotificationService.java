@@ -75,15 +75,15 @@ public class NotificationService extends Service {
                 List<Expense> expenses = appDatabase.expenseDao().getExpensesByUserId(budget.userId);
                 double totalExpenses = 0;
                 for (Expense expense : expenses) {
-                    if (expense.category.equals(budget.name)) {
+                    if (expense.category.equals(budget.category)) {
                         totalExpenses += expense.amount;
                     }
                 }
 
                 if (totalExpenses >= budget.amount) {
-                    sendNotification("Budget Exceeded", "You have exceeded your budget for " + budget.name);
+                    sendNotification("Budget Exceeded", "You have exceeded your budget for " + budget.category);
                 } else if (totalExpenses >= budget.amount * 0.9) {
-                    sendNotification("Budget Alert", "You are approaching your budget limit for " + budget.name);
+                    sendNotification("Budget Alert", "You are approaching your budget limit for " + budget.category);
                 }
             }
         });
