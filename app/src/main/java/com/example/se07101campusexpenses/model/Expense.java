@@ -14,6 +14,9 @@ public class Expense implements Serializable {
     public double amount;
     public String category;
     public int userId;
+    public boolean recurring;
+    public String recurringStartDate;
+    public String recurringEndDate;
 
     public int getId() {
         return id;
@@ -61,5 +64,29 @@ public class Expense implements Serializable {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public boolean isRecurring() {
+        return recurring;
+    }
+
+    public void setRecurring(boolean recurring) {
+        this.recurring = recurring;
+    }
+
+    public String getRecurringStartDate() {
+        return recurringStartDate;
+    }
+
+    public void setRecurringStartDate(String recurringStartDate) {
+        this.recurringStartDate = recurringStartDate;
+    }
+
+    public String getRecurringEndDate() {
+        return recurringEndDate;
+    }
+
+    public void setRecurringEndDate(String recurringEndDate) {
+        this.recurringEndDate = recurringEndDate;
     }
 }

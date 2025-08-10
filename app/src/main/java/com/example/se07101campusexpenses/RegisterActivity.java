@@ -12,20 +12,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User;
-import com.example.se07101campusexpenses.model.UserDao;
 
 public class RegisterActivity extends AppCompatActivity {
     EditText edtUsername, edtPassword;
     Button btnSignUp;
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        userDao = AppDatabase.getInstance(this).userDao();
+        userRepository = new UserRepository(this);
         edtUsername = findViewById(R.id.edtUsername);
         edtPassword = findViewById(R.id.edtPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
@@ -46,14 +46,14 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
-                User existingUser = userDao.getUserByUsername(username);
+                User existingUser = userRepository.getUserByUsername(username);
                 if (existingUser != null) {
                     runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show());
                 } else {
                     User newUser = new User();
                     newUser.username = username;
                     newUser.password = password; // In a real app, hash the password
-                    userDao.insert(newUser);
+                    userRepository.saveUserAccount(newUser);
                     runOnUiThread(() -> {
                         Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);

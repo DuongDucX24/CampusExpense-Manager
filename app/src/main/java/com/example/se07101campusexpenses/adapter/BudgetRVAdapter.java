@@ -19,7 +19,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     public Context context;
     public OnClickListener clickListener;
     public interface OnClickListener {
-        void onClick(int position);
+        void onClick(int position, Budget budget); // Pass Budget object on click
     }
     public void setOnClickListener(OnClickListener clickListener){
         this.clickListener = clickListener;
@@ -39,11 +39,12 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     @Override
     public void onBindViewHolder(@NonNull BudgetRVAdapter.BudgetItemViewHolder holder, int position) {
         Budget model = budgetModels.get(position);
-        holder.tvNameBudget.setText(model.category);
+        holder.tvNameBudget.setText(model.name); // Changed from model.category to model.name
         holder.tvBudgetMoney.setText(String.valueOf(model.amount));
+        // holder.tvBudgetPeriod.setText(model.period); // Uncomment if you add tvBudgetPeriod to layout
         holder.itemView.setOnClickListener(view -> {
             if (clickListener != null){
-                clickListener.onClick(position);
+                clickListener.onClick(position, model); // Pass budget object
             }
         });
     }
@@ -57,16 +58,18 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     }
 
     public class BudgetItemViewHolder extends RecyclerView.ViewHolder{
-        TextView tvNameBudget, tvBudgetMoney;
+        TextView tvNameBudget, tvBudgetMoney; // Potentially TextView tvBudgetPeriod;
         View itemView;
         public BudgetItemViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
             tvNameBudget = itemView.findViewById(R.id.tvNameBudget);
             tvBudgetMoney = itemView.findViewById(R.id.tvMoneyBudget);
+            // tvBudgetPeriod = itemView.findViewById(R.id.tvBudgetPeriod); // Initialize if added
             itemView.setOnClickListener(view -> {
                 if (clickListener != null){
-                    clickListener.onClick(getAdapterPosition());
+                    // Pass the specific budget item on click
+                    clickListener.onClick(getAdapterPosition(), budgetModels.get(getAdapterPosition()));
                 }
             });
         }

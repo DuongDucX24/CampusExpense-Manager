@@ -1,8 +1,10 @@
-package com.example.se07101campusexpenses.model;
+package com.example.se07101campusexpenses.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+
+import com.example.se07101campusexpenses.model.User; // Added import
 
 @Dao
 public interface UserDao {
@@ -15,4 +17,3 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE username = :username")
     User getUserByUsername(String username);
 }
-

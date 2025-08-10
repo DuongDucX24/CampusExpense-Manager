@@ -1,6 +1,5 @@
 package com.example.se07101campusexpenses.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,24 +9,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
-import com.example.se07101campusexpenses.database.BudgetModel;
+import com.example.se07101campusexpenses.model.Budget; // Corrected import
 
 import java.util.List;
 
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder> {
 
-    private List<BudgetModel> budgetList;
+    private List<Budget> budgetList; // Changed type to Budget
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(BudgetModel budget);
+        void onItemClick(Budget budget); // Changed type to Budget
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    public BudgetAdapter(List<BudgetModel> budgetList) {
+    public BudgetAdapter(List<Budget> budgetList) { // Changed type to Budget
         this.budgetList = budgetList;
     }
 
@@ -41,7 +40,7 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
 
     @Override
     public void onBindViewHolder(@NonNull BudgetViewHolder holder, int position) {
-        BudgetModel currentBudget = budgetList.get(position);
+        Budget currentBudget = budgetList.get(position); // Changed type to Budget
         holder.tvBudgetName.setText(currentBudget.getName());
         holder.tvBudgetAmount.setText(String.format("Amount: $%.2f", currentBudget.getAmount()));
         holder.tvBudgetPeriod.setText(currentBudget.getPeriod());

@@ -13,13 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User;
-import com.example.se07101campusexpenses.model.UserDao;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtUsername, edtPassword;
     Button btnLogin;
-    private UserDao userDao;
+    private UserRepository userRepository;
     TextView tvRegister;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
         edtUsername = findViewById(R.id.edtUsername);
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegisterAccount);
-        userDao = AppDatabase.getInstance(this).userDao();
+        userRepository = new UserRepository(this);
         checkUserLogin();
 
         tvRegister.setOnClickListener(v -> {
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
-                User user = userDao.login(username, password);
+                User user = userRepository.login(username, password);
                 runOnUiThread(() -> {
                     if (user != null) {
                         // Save user ID to SharedPreferences

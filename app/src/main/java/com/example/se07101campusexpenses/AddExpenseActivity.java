@@ -12,36 +12,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Expense;
-import com.example.se07101campusexpenses.model.ExpenseDao;
 
 import java.util.Calendar;
 
-/**
- * Activity for adding a new expense.
- *
- * <p>This activity provides a user interface for inputting expense details, including
- * description, amount, date, category, and whether it's a recurring expense.
- * It uses {@link ExpenseDao} to interact with the database for saving expenses.
- * </p>
- *
- * <p>Key features include:
- * <ul>
- *     <li>Input fields for expense description, amount, and date.</li>
- *     <li>A spinner for selecting the expense category.</li>
- *     <li>A checkbox to indicate if the expense is recurring.</li>
- *     <li>Conditional visibility for recurring start and end date pickers.</li>
- *     <li>Date pickers for selecting dates.</li>
- *     <li>Validation to ensure all required fields are filled.</li>
- *     <li>Saving the expense to the database.</li>
- * </ul>
- * </p>
- */
 public class AddExpenseActivity extends AppCompatActivity {
 
     private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate;
     private Spinner spinnerExpenseCategory;
-    private ExpenseDao expenseDao;
+    private ExpenseRepository expenseRepository;
     private int userId;
 
     @Override
@@ -49,7 +29,7 @@ public class AddExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_expense);
 
-        expenseDao = AppDatabase.getInstance(this).expenseDao();
+        expenseRepository = new ExpenseRepository(this);
         userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
 
         edtExpenseDescription = findViewById(R.id.edtExpenseDescription);
@@ -105,11 +85,12 @@ public class AddExpenseActivity extends AppCompatActivity {
         expense.setDate(date);
         expense.setCategory(category);
         expense.setUserId(userId);
+        expense.setRecurring(false); // Assuming non-recurring for this form
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            expenseDao.insert(expense);
+            expenseRepository.addExpense(expense);
             runOnUiThread(() -> {
-                Toast.makeText(this, "Expense saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Expense saved successfully", Toast.LENGTH_SHORT).show();
                 finish();
             });
         });

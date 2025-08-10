@@ -18,29 +18,41 @@ import com.example.se07101campusexpenses.model.Budget;
 public class EditBudgetActivity extends AppCompatActivity {
     private BudgetDao budgetDao;
     private Budget budget;
+    private EditText edtBudgetName, edtBudgetAmount; // edtBudgetPeriod removed for now
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_budget);
+        // TODO: Ensure this layout (activity_add_budget or a specific activity_edit_budget) 
+        // has edtBudgetName, edtBudgetMoney, btnSaveBudget, btnDeleteBudget, btnBackBudget.
+        // If using a separate edit layout, change R.layout.activity_add_budget below.
+        setContentView(R.layout.activity_add_budget); 
 
         budgetDao = AppDatabase.getInstance(this).budgetDao();
 
-        EditText edtBudgetName = findViewById(R.id.edtBudgetName);
-        EditText edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
+        edtBudgetName = findViewById(R.id.edtBudgetName);
+        edtBudgetAmount = findViewById(R.id.edtBudgetMoney); // Assuming edtBudgetMoney is for amount
+        // TODO: Add an EditText with id edtBudgetPeriod to your layout and uncomment the line below
+        // edtBudgetPeriod = findViewById(R.id.edtBudgetPeriod);
+
         Button btnSaveBudget = findViewById(R.id.btnSaveBudget);
-        Button btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
+        // TODO: Add a Button with id btnDeleteBudget to your layout and uncomment the line below
+        // Button btnDeleteBudget = findViewById(R.id.btnDeleteBudget);
         Button btnBackBudget = findViewById(R.id.btnBackBudget);
 
         budget = (Budget) getIntent().getSerializableExtra("budget");
         if (budget != null) {
-            edtBudgetName.setText(budget.getCategory());
+            edtBudgetName.setText(budget.getName()); // Changed from getCategory to getName
             edtBudgetAmount.setText(String.valueOf(budget.getAmount()));
+            // TODO: Uncomment and use if edtBudgetPeriod is added
+            // if (edtBudgetPeriod != null) edtBudgetPeriod.setText(budget.getPeriod()); 
         }
 
         btnSaveBudget.setOnClickListener(v -> {
             String budgetName = edtBudgetName.getText().toString().trim();
             String budgetAmountStr = edtBudgetAmount.getText().toString().trim();
+            // TODO: Uncomment and use if edtBudgetPeriod is added
+            // String budgetPeriod = edtBudgetPeriod != null ? edtBudgetPeriod.getText().toString().trim() : budget.getPeriod();
 
             if (TextUtils.isEmpty(budgetName) || TextUtils.isEmpty(budgetAmountStr)) {
                 Toast.makeText(EditBudgetActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
@@ -49,8 +61,10 @@ public class EditBudgetActivity extends AppCompatActivity {
 
             double budgetAmount = Double.parseDouble(budgetAmountStr);
 
-            budget.setCategory(budgetName);
+            budget.setName(budgetName); // Changed from setCategory to setName
             budget.setAmount(budgetAmount);
+            // TODO: Set budget.period from edtBudgetPeriod if added
+            // budget.setPeriod(budgetPeriod);
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
                 budgetDao.update(budget);
@@ -61,17 +75,22 @@ public class EditBudgetActivity extends AppCompatActivity {
             });
         });
 
-        btnDeleteBudget.setOnClickListener(v -> {
-            if (budget != null) {
-                AppDatabase.databaseWriteExecutor.execute(() -> {
-                    budgetDao.delete(budget);
-                    runOnUiThread(() -> {
-                        Toast.makeText(EditBudgetActivity.this, "Budget deleted", Toast.LENGTH_SHORT).show();
-                        finish();
+        // TODO: Uncomment this block if btnDeleteBudget is added to the layout
+        /*
+        if (btnDeleteBudget != null) { 
+            btnDeleteBudget.setOnClickListener(v -> {
+                if (budget != null) {
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        budgetDao.delete(budget);
+                        runOnUiThread(() -> {
+                            Toast.makeText(EditBudgetActivity.this, "Budget deleted", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        }
+        */
 
         btnBackBudget.setOnClickListener(v -> finish());
     }

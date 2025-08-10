@@ -1,49 +1,46 @@
 package com.example.se07101campusexpenses.database;
 
-import java.io.Serializable;
-
-public class BudgetModel implements Serializable {
-    private int id;
+public class BudgetModel {
     private String name;
     private double amount;
     private String period;
+    private int id; // Assuming an ID field might be useful for database operations
 
-    public BudgetModel() {
-    }
-
-    public BudgetModel(int id, String name, double amount, String period) {
-        this.id = id;
+    // Constructor
+    public BudgetModel(String name, double amount, String period) {
         this.name = name;
         this.amount = amount;
         this.period = period;
     }
 
+    // Getters
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
     public String getPeriod() {
         return period;
+    }
+
+    // Setters (optional, but good practice if fields might be updated)
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public void setPeriod(String period) {
