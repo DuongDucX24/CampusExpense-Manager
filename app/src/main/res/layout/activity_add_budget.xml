@@ -38,9 +38,17 @@
         android:inputType="numberDecimal"
         android:minHeight="48dp"
         tools:ignore="VisualLintTextFieldSize" />
-
     <EditText
-        android:id="@+id/edtDescription"
+        android:id="@+id/edtBudgetPeriod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="false"
+        android:hint="Enter budget period (e.g., Monthly)"
+        android:inputType="textMultiLine"
+        android:minHeight="48dp"
+        tools:ignore="VisualLintTextFieldSize" />
+    <EditText
+        android:id="@+id/edtBudgetDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"

@@ -40,6 +40,7 @@ public interface ExpenseDao {
 
     // This query returns a list of expenses, not grouped by category. 
     // If you need sums per category for a specific user, it would be different.
+    // If you need sums per category for a specific user, it would be different.
     // For now, returning all expenses for a user, or global if no user context.
     @Query("SELECT * FROM expenses WHERE userId = :userId ORDER BY category, date DESC") // Added
     List<Expense> getExpensesByCategoryAndUserId(int userId);

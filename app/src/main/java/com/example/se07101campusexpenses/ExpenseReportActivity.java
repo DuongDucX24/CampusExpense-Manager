@@ -16,7 +16,9 @@ import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter; // Added import
 
+import java.text.NumberFormat; // Added import
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,11 +30,15 @@ public class ExpenseReportActivity extends AppCompatActivity {
     private TextView tvReportTotal;
     private PieChart reportPieChart;
     private ExpenseRepository expenseRepository;
+    private NumberFormat vndFormat; // Added for currency formatting
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_report);
+
+        vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
+        vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
 
         etStartDate = findViewById(R.id.etStartDate);
         etEndDate = findViewById(R.id.etEndDate);
@@ -62,7 +68,7 @@ public class ExpenseReportActivity extends AppCompatActivity {
         for (Expense expense : expenses) {
             total += expense.getAmount();
         }
-        tvReportTotal.setText(String.format(Locale.US, "Total Expenses: $%.2f", total));
+        tvReportTotal.setText("Total Expenses: " + vndFormat.format(total)); // Use VND format
 
         setupPieChart(startDate, endDate);
     }
@@ -79,8 +85,19 @@ public class ExpenseReportActivity extends AppCompatActivity {
         PieDataSet dataSet = new PieDataSet(entries, "Expenses by Category");
         // TODO: Add colors to PieDataSet for better visualization
         // dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+
+        // Format slice values as VND
+        dataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return vndFormat.format(value);
+            }
+        });
+        dataSet.setValueTextSize(12f);
+
         PieData pieData = new PieData(dataSet);
         reportPieChart.setData(pieData);
+        reportPieChart.getDescription().setEnabled(false);
         reportPieChart.invalidate(); // refresh
     }
 }

@@ -11,16 +11,18 @@ public class Budget implements Serializable { // Implemented Serializable
     public String name;     // Corresponds to category or budget item name
     public double amount;   // The budgeted amount
     public String period;   // e.g., "Monthly", "Annually"
+    public String description; // Added description
     public int userId;      // Added userId
 
     // Room requires a no-arg constructor if there are other constructors
     public Budget() {}
 
-    // Updated constructor to include userId
-    public Budget(String name, double amount, String period, int userId) {
+    // Updated constructor to include userId and description
+    public Budget(String name, double amount, String period, String description, int userId) {
         this.name = name;
         this.amount = amount;
         this.period = period;
+        this.description = description;
         this.userId = userId;
     }
 
@@ -39,6 +41,10 @@ public class Budget implements Serializable { // Implemented Serializable
 
     public String getPeriod() {
         return period;
+    }
+
+    public String getDescription() { // Added getter for description
+        return description;
     }
 
     public int getUserId() { // Added getter for userId
@@ -60,6 +66,10 @@ public class Budget implements Serializable { // Implemented Serializable
 
     public void setPeriod(String period) {
         this.period = period;
+    }
+
+    public void setDescription(String description) { // Added setter for description
+        this.description = description;
     }
 
     public void setUserId(int userId) { // Added setter for userId

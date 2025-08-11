@@ -4,16 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BudgetFragment"
-    android:padding="10dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp">
     <!-- TODO: Update blank fragment layout -->
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#07A6ED"
-        android:text="Create Budget"
+        android:text="@string/create_budget_button_text"
         android:id="@+id/btnCreateBudget"
         android:padding="8dp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

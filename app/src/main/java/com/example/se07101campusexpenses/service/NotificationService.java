@@ -18,13 +18,16 @@ import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.model.Expense;
 
+import java.text.NumberFormat; // Added import
 import java.util.List;
+import java.util.Locale; // Added import
 
 public class NotificationService extends Service {
     private static final String CHANNEL_ID = "BudgetChannel";
     private Handler handler = new Handler();
     private AppDatabase appDatabase;
     private int userId;
+    private NumberFormat vndFormat; // Added for currency formatting
 
     private Runnable runnable = new Runnable() {
         @Override
@@ -41,6 +44,9 @@ public class NotificationService extends Service {
         createNotificationChannel();
         SharedPreferences prefs = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         userId = prefs.getInt("user_id", -1); // Get current user ID
+
+        vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
+        vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
     }
 
     @Override
@@ -98,28 +104,36 @@ public class NotificationService extends Service {
                     }
                 }
 
+                String formattedBudgetAmount = vndFormat.format(budget.getAmount());
+                String formattedTotalExpenses = vndFormat.format(totalExpensesForCategory);
+
                 if (totalExpensesForCategory >= budget.getAmount()) {
-                    sendNotification("Budget Exceeded", "You have exceeded your budget for " + budgetCategory, budgetCategory);
+                    sendNotification("Budget Exceeded for " + budgetCategory,
+                            "Spent " + formattedTotalExpenses + " of " + formattedBudgetAmount,
+                            budgetCategory + "_exceeded"); // Unique ID part
                 } else if (totalExpensesForCategory >= budget.getAmount() * 0.9) {
-                    sendNotification("Budget Alert", "You are approaching your budget limit for " + budgetCategory, budgetCategory);
+                     sendNotification("Budget Alert for " + budgetCategory,
+                            "Spent " + formattedTotalExpenses + " of " + formattedBudgetAmount + " (90% limit)",
+                             budgetCategory + "_alert"); // Unique ID part
                 }
             }
         });
     }
 
     // Added budgetCategoryForId to make notification ID unique
-    private void sendNotification(String title, String message, String budgetCategoryForId) {
+    private void sendNotification(String title, String message, String notificationTag) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 // TODO: Replace R.drawable.ic_launcher_background with a proper notification icon e.g. R.drawable.ic_notification
                 .setSmallIcon(R.drawable.ic_launcher_background) 
                 .setContentTitle(title)
                 .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message)) // For longer messages
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (notificationManager != null) {
-            // Use a unique ID for each notification, e.g., based on category name hashcode
-            notificationManager.notify(budgetCategoryForId.hashCode(), builder.build()); 
+            // Use a unique ID for each notification, e.g., based on category name hashcode + tag
+            notificationManager.notify(notificationTag.hashCode(), builder.build()); 
         }
     }
 }
