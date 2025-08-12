@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 // import android.widget.TextView; // TextView import no longer needed for btnRegister
@@ -15,6 +16,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User;
+import com.example.se07101campusexpenses.security.PasswordUtils;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtUsername, edtPassword;
@@ -72,21 +77,26 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
-                User user = userRepository.login(username, password);
+                User user = userRepository.getUserByUsername(username);
                 runOnUiThread(() -> {
-                    if (user != null) {
-                        // Save user ID to SharedPreferences
-                        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putInt(KEY_USER_ID, user.id);
-                        editor.apply();
+                    try {
+                        if (user != null && PasswordUtils.verifyPassword(password, user.getPassword())) {
+                            // Save user ID to SharedPreferences
+                            SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt(KEY_USER_ID, user.id);
+                            editor.apply();
 
-                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                        Log.e("LoginActivity", "Error during login", e);
+                        Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show();
                     }
                 });
             });

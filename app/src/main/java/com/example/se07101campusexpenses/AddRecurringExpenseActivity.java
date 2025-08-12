@@ -77,6 +77,6 @@ public class AddRecurringExpenseActivity extends AppCompatActivity {
 
     private int getCurrentUserId() {
         // Implement logic to get the current user's ID
-        return 1; // Placeholder
+        return getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
     }
 }

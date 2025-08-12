@@ -20,4 +20,8 @@
     </string-array>
     <string name="date_range">%1$s to %2$s</string>
     <string name="create_budget_button_text">Create Budget</string>
+    <string name="user_not_logged_in">User not logged in</string>
+    <string name="error_loading_data">Error loading data</string>
+    <string name="total_spending">Total Spending: %s</string>
+    <string name="remaining_budget">Remaining Budget: %s</string>
 </resources>

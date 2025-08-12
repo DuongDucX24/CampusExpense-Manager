@@ -49,4 +49,14 @@ public class UserRepository {
             return null;
         }
     }
+
+    public User getUserById(final int userId) {
+        Future<User> future = AppDatabase.databaseWriteExecutor.submit(() -> userDao.getUserById(userId));
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -26,5 +26,5 @@ public interface RecurringExpenseDao {
     List<RecurringExpense> getAllRecurringExpensesByUserId(int userId);
 
     @Query("SELECT * FROM recurring_expenses") // Needed by RecurringExpenseService
-    List<RecurringExpense> getAllRecurringExpenses();
+    List<RecurringExpense> getAll();
 }

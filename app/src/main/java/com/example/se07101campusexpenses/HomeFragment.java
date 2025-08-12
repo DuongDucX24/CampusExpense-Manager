@@ -15,17 +15,11 @@ import androidx.fragment.app.Fragment;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
-import com.example.se07101campusexpenses.model.CategorySum;
 import com.example.se07101campusexpenses.model.Expense;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -41,7 +35,6 @@ public class HomeFragment extends Fragment {
 
     private TextView tvTotalSpending, tvRemainingBudget;
     private LineChart chart;
-    private PieChart pieChart;
     private ExpenseRepository expenseRepository;
     private BudgetRepository budgetRepository;
     private int userId;
@@ -55,7 +48,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
+        vndFormat.setMaximumFractionDigits(0);
     }
 
     @Override
@@ -71,7 +64,6 @@ public class HomeFragment extends Fragment {
             tvTotalSpending = view.findViewById(R.id.tvTotalSpending);
             tvRemainingBudget = view.findViewById(R.id.tvRemainingBudget);
             chart = view.findViewById(R.id.chart);
-            pieChart = view.findViewById(R.id.pieChart);
 
             SharedPreferences prefs = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
             userId = prefs.getInt("user_id", -1);
@@ -80,7 +72,6 @@ public class HomeFragment extends Fragment {
             budgetRepository = new BudgetRepository(requireContext());
 
             setupLineChartListener();
-            // loadDashboardData(); // Moved to onResume
         } catch (Exception e) {
             Log.e(TAG, "Error in onViewCreated: " + e.getMessage(), e);
         }
@@ -89,7 +80,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadDashboardData(); // Load/refresh data when fragment is resumed
+        loadDashboardData();
     }
 
     private void setupLineChartListener() {
@@ -122,7 +113,7 @@ public class HomeFragment extends Fragment {
                     if (userId == -1) {
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(() -> {
-                                tvTotalSpending.setText("User not logged in");
+                                tvTotalSpending.setText(R.string.user_not_logged_in);
                                 tvRemainingBudget.setText("");
                             });
                         }
@@ -132,16 +123,18 @@ public class HomeFragment extends Fragment {
                     double totalBudget = budgetRepository.getTotalBudgetByUserId(userId);
                     double remainingBudget = totalBudget - totalSpending;
                     List<Expense> userExpenses = expenseRepository.getExpensesByUserId(userId);
-                    List<CategorySum> expensesByCategory = expenseRepository.getCategorySumsByUserId(userId);
 
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
+                            if (!isAdded() || getView() == null) {
+                                Log.w(TAG, "Fragment not attached or view destroyed, skipping UI update.");
+                                return;
+                            }
                             updateSummary(totalSpending, remainingBudget);
                             if (userExpenses != null) {
                                 setupChart(userExpenses);
-                            }
-                            if (expensesByCategory != null) {
-                                setupPieChart(expensesByCategory);
+                            } else if (chart == null) {
+                                Log.w(TAG, "Line chart is null, cannot setup.");
                             }
                         });
                     }
@@ -149,7 +142,7 @@ public class HomeFragment extends Fragment {
                     Log.e(TAG, "Error in background task of loadDashboardData: " + e.getMessage(), e);
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            tvTotalSpending.setText("Error loading data");
+                            tvTotalSpending.setText(R.string.error_loading_data);
                             tvRemainingBudget.setText("");
                         });
                     }
@@ -162,102 +155,52 @@ public class HomeFragment extends Fragment {
 
     private void updateSummary(double totalSpending, double remainingBudget) {
         try {
-            tvTotalSpending.setText("Total Spending: " + vndFormat.format(totalSpending));
-            tvRemainingBudget.setText("Remaining Budget: " + vndFormat.format(remainingBudget));
+            tvTotalSpending.setText(getString(R.string.total_spending, vndFormat.format(totalSpending)));
+            tvRemainingBudget.setText(getString(R.string.remaining_budget, vndFormat.format(remainingBudget)));
         } catch (Exception e) {
             Log.e(TAG, "Error in updateSummary: " + e.getMessage(), e);
         }
     }
 
     private void setupChart(List<Expense> expenses) {
+        if (getView() == null || !isAdded() || chart == null) {
+            Log.w(TAG, "setupChart: View, fragment, or chart is null/not ready.");
+            return;
+        }
         try {
-            if (chart == null || expenses == null) {
-                Log.w(TAG, "setupChart: Chart or expenses is null.");
-                return;
-            }
             List<Entry> entries = new ArrayList<>();
-            for (int i = 0; i < expenses.size(); i++) {
-                if (expenses.get(i) != null) {
-                    entries.add(new Entry(i, (float) expenses.get(i).getAmount()));
+            if (expenses != null) {
+                for (int i = 0; i < expenses.size(); i++) {
+                    if (expenses.get(i) != null) {
+                        entries.add(new Entry(i, (float) expenses.get(i).getAmount()));
+                    }
                 }
             }
 
-            if (entries.isEmpty()) {
-                Log.i(TAG, "No entries to display in LineChart.");
-                chart.clear();
-                chart.invalidate();
-                return;
-            }
+            LineDataSet dataSet = getLineDataSet(entries);
 
-            LineDataSet dataSet = new LineDataSet(entries, "Expense Trend");
-            dataSet.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getFormattedValue(float value) {
-                    return vndFormat.format(value);
-                }
-            });
-
-            LineData lineData = new LineData(dataSet);
-            chart.setData(lineData);
-
-            YAxis leftAxis = chart.getAxisLeft();
-            leftAxis.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getFormattedValue(float value) {
-                    return vndFormat.format(value);
-                }
-            });
-            chart.getAxisRight().setEnabled(false); // Disable right axis
-
-            chart.getDescription().setEnabled(false);
+            chart.setData(new LineData(dataSet));
             chart.invalidate();
-            Log.i(TAG, "LineChart setup complete with " + entries.size() + " entries.");
+            Log.i(TAG, "LineChart setup complete.");
         } catch (Exception e) {
             Log.e(TAG, "Error in setupChart: " + e.getMessage(), e);
         }
     }
 
-    private void setupPieChart(List<CategorySum> categorySums) {
-        try {
-            if (pieChart == null || categorySums == null) {
-                Log.w(TAG, "setupPieChart: PieChart or categorySums is null.");
-                return;
-            }
-            List<PieEntry> entries = new ArrayList<>();
-            for (CategorySum categorySum : categorySums) {
-                if (categorySum != null) {
-                    String label = categorySum.category != null ? categorySum.category : ""; // Ensure label is not null
-                    entries.add(new PieEntry((float) categorySum.amount, label));
+    @NonNull
+    private LineDataSet getLineDataSet(List<Entry> entries) {
+        LineDataSet dataSet = new LineDataSet(entries, "Expense Trend");
+        dataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (vndFormat == null) {
+                    Log.e(TAG, "vndFormat is null in LineChart ValueFormatter!");
+                    return String.valueOf(value);
                 }
+                return vndFormat.format(value);
             }
-
-            if (entries.isEmpty()) {
-                Log.i(TAG, "No entries to display in PieChart.");
-                pieChart.clear();
-                pieChart.invalidate();
-                return;
-            }
-
-            PieDataSet dataSet = new PieDataSet(entries, "Expenses by Category");
-            dataSet.setColors(com.github.mikephil.charting.utils.ColorTemplate.MATERIAL_COLORS);
-            dataSet.setValueFormatter(new ValueFormatter() { // Format slice values as VND
-                @Override
-                public String getFormattedValue(float value) {
-                    return vndFormat.format(value);
-                }
-            });
-            dataSet.setValueTextSize(12f);
-
-
-            PieData pieData = new PieData(dataSet);
-            pieChart.setData(pieData);
-            pieChart.getDescription().setEnabled(false);
-            // pieChart.setUsePercentValues(true); // If you want percents, disable the VND formatter for values
-            pieChart.setEntryLabelTextSize(10f);
-            pieChart.invalidate();
-            Log.i(TAG, "PieChart setup complete with " + entries.size() + " entries.");
-        } catch (Exception e) {
-            Log.e(TAG, "Error in setupPieChart: " + e.getMessage(), e);
-        }
+        });
+        return dataSet;
     }
+
 }

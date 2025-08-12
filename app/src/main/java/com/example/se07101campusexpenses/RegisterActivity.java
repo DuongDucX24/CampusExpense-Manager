@@ -1,10 +1,11 @@
 package com.example.se07101campusexpenses;
 
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast; // Added for later use
-import android.text.TextUtils; // Added for validation
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.se07101campusexpenses.database.AppDatabase; // Added for DB access
 import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User; // Added for User model
+import com.example.se07101campusexpenses.security.PasswordUtils;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -54,22 +59,26 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Implement secure password hashing here!
-        // For now, storing plaintext (NOT SECURE - FOR DEMO ONLY)
-        User newUser = new User(username, password, email); // HASH THE PASSWORD INSTEAD
+        try {
+            String hashedPassword = PasswordUtils.hashPassword(password);
+            User newUser = new User(username, hashedPassword, email);
 
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            // Check if user already exists
-            User existingUser = userRepository.getUserByUsername(username);
-            if (existingUser == null) {
-                userRepository.saveUserAccount(newUser);
-                runOnUiThread(() -> {
-                    Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                    finish(); // Go back to LoginActivity
-                });
-            } else {
-                runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show());
-            }
-        });
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                // Check if user already exists
+                User existingUser = userRepository.getUserByUsername(username);
+                if (existingUser == null) {
+                    userRepository.saveUserAccount(newUser);
+                    runOnUiThread(() -> {
+                        Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                        finish(); // Go back to LoginActivity
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show());
+                }
+            });
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            Log.e("RegisterActivity", "Error hashing password", e);
+            Toast.makeText(this, "Error creating account", Toast.LENGTH_SHORT).show();
+        }
     }
 }

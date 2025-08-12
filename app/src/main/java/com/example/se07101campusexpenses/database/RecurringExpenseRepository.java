@@ -17,7 +17,7 @@ public class RecurringExpenseRepository {
 
     // This method is used by RecurringExpenseService to get all recurring expenses across all users.
     public List<RecurringExpense> getAllRecurringExpenses() {
-        Future<List<RecurringExpense>> future = AppDatabase.databaseWriteExecutor.submit(recurringExpenseDao::getAllRecurringExpenses);
+        Future<List<RecurringExpense>> future = AppDatabase.databaseWriteExecutor.submit(recurringExpenseDao::getAll);
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
