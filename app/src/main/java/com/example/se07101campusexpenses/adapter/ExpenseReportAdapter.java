@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.se07101campusexpenses.R;
-import com.example.se07101campusexpenses.database.Expense;
+import com.example.se07101campusexpenses.model.Expense; // Corrected import
 import java.util.List;
 
 public class ExpenseReportAdapter extends RecyclerView.Adapter<ExpenseReportAdapter.ViewHolder> {

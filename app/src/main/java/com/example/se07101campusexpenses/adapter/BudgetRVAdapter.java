@@ -12,21 +12,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.model.Budget;
 
+import java.text.NumberFormat; // Added import
 import java.util.List;
+import java.util.Locale;
 
 public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.BudgetItemViewHolder> {
     private List<Budget> budgetModels;
     public Context context;
     public OnClickListener clickListener;
+    private NumberFormat vndFormat; // Added for currency formatting
+
     public interface OnClickListener {
-        void onClick(int position);
+        void onClick(int position, Budget budget); // Pass Budget object on click
     }
-    public void setOnClickListener(OnClickListener clickListener){
+
+    public void setOnClickListener(OnClickListener clickListener) {
         this.clickListener = clickListener;
     }
-    public BudgetRVAdapter(List<Budget> model, Context context){
+
+    public BudgetRVAdapter(List<Budget> model, Context context) {
         this.budgetModels = model;
         this.context = context;
+        this.vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
+        this.vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
     }
 
     @NonNull
@@ -39,13 +47,18 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     @Override
     public void onBindViewHolder(@NonNull BudgetRVAdapter.BudgetItemViewHolder holder, int position) {
         Budget model = budgetModels.get(position);
-        holder.tvNameBudget.setText(model.category);
-        holder.tvBudgetMoney.setText(String.valueOf(model.amount));
-        holder.itemView.setOnClickListener(view -> {
-            if (clickListener != null){
-                clickListener.onClick(position);
-            }
-        });
+        if (model != null) {
+            holder.tvNameBudget.setText(model.getName());
+            // Format budget amount using vndFormat
+            holder.tvBudgetMoney.setText(vndFormat.format(model.getAmount()));
+            holder.tvBudgetDescription.setText(model.getDescription());
+            holder.tvBudgetPeriod.setText(model.getPeriod());
+            holder.itemView.setOnClickListener(view -> {
+                if (clickListener != null) {
+                    clickListener.onClick(position, model); // Pass budget object
+                }
+            });
+        }
     }
 
     @Override
@@ -56,24 +69,22 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
         return 0;
     }
 
-    public class BudgetItemViewHolder extends RecyclerView.ViewHolder{
-        TextView tvNameBudget, tvBudgetMoney;
+    public class BudgetItemViewHolder extends RecyclerView.ViewHolder {
+        TextView tvNameBudget, tvBudgetMoney, tvBudgetDescription, tvBudgetPeriod;
         View itemView;
+
         public BudgetItemViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
             tvNameBudget = itemView.findViewById(R.id.tvNameBudget);
             tvBudgetMoney = itemView.findViewById(R.id.tvMoneyBudget);
-            itemView.setOnClickListener(view -> {
-                if (clickListener != null){
-                    clickListener.onClick(getAdapterPosition());
-                }
-            });
+            tvBudgetDescription = itemView.findViewById(R.id.tvBudgetDescription);
+            tvBudgetPeriod = itemView.findViewById(R.id.tvBudgetPeriod);
         }
     }
 
     public void setBudgets(List<Budget> budgets) {
         this.budgetModels = budgets;
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Consider using DiffUtil for better performance
     }
 }

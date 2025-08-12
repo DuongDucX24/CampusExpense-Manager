@@ -1,6 +1,8 @@
 package com.example.se07101campusexpenses;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +26,9 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
+    private static final String PREFS_NAME = "user_prefs"; // Added for SharedPreferences
+    private static final String KEY_USER_ID = "user_id"; // Added for SharedPreferences
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +50,19 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         // xu ly logout
         itemLogout.setOnMenuItemClickListener(item -> {
             drawerLayout.closeDrawer(GravityCompat.START);
+
+            // Clear SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(KEY_USER_ID); // Or editor.clear() to remove all preferences
+            editor.apply();
+
+            // Navigate to LoginActivity and clear task stack
             Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish();
-            return false;
+            finish(); // Finish MenuActivity
+            return true; // Return true to indicate the click was handled
         });
 
         // xu ly click vao tab bottom menu

@@ -12,8 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Expense;
-import com.example.se07101campusexpenses.model.ExpenseDao;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -23,7 +23,7 @@ public class EditExpenseActivity extends AppCompatActivity {
     private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate;
     private Spinner spinnerExpenseCategory;
 
-    private ExpenseDao expenseDao;
+    private ExpenseRepository expenseRepository;
     private Expense expense;
 
     @Override
@@ -31,7 +31,7 @@ public class EditExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_expense);
 
-        expenseDao = AppDatabase.getInstance(this).expenseDao();
+        expenseRepository = new ExpenseRepository(this);
 
         edtExpenseDescription = findViewById(R.id.edtExpenseDescription);
         edtExpenseAmount = findViewById(R.id.edtExpenseAmount);
@@ -62,11 +62,11 @@ public class EditExpenseActivity extends AppCompatActivity {
     }
 
     private void populateFields() {
-        edtExpenseDescription.setText(expense.description);
-        edtExpenseAmount.setText(String.valueOf(expense.amount));
-        edtExpenseDate.setText(expense.date);
+        edtExpenseDescription.setText(expense.getDescription());
+        edtExpenseAmount.setText(String.valueOf(expense.getAmount()));
+        edtExpenseDate.setText(expense.getDate());
         String[] categories = getResources().getStringArray(R.array.expense_categories);
-        spinnerExpenseCategory.setSelection(Arrays.asList(categories).indexOf(expense.category));
+        spinnerExpenseCategory.setSelection(Arrays.asList(categories).indexOf(expense.getCategory()));
     }
 
     private void showDatePickerDialog(final EditText editText) {
@@ -96,27 +96,29 @@ public class EditExpenseActivity extends AppCompatActivity {
 
         double amount = Double.parseDouble(amountStr);
 
-        expense.description = description;
-        expense.amount = amount;
-        expense.date = date;
-        expense.category = category;
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setDate(date);
+        expense.setCategory(category);
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            expenseDao.update(expense);
+            expenseRepository.updateExpense(expense);
             runOnUiThread(() -> {
-                Toast.makeText(this, "Expense updated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Expense updated successfully", Toast.LENGTH_SHORT).show();
                 finish();
             });
         });
     }
 
     private void deleteExpense() {
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            expenseDao.delete(expense);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Expense deleted", Toast.LENGTH_SHORT).show();
-                finish();
+        if (expense != null) {
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                expenseRepository.deleteExpense(expense.getId());
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Expense deleted successfully", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
             });
-        });
+        }
     }
 }

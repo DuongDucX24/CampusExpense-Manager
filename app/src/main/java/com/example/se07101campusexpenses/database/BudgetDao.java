@@ -1,10 +1,10 @@
 package com.example.se07101campusexpenses.database;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+import androidx.room.Delete;
 import com.example.se07101campusexpenses.model.Budget;
 import java.util.List;
 
@@ -19,12 +19,18 @@ public interface BudgetDao {
     @Delete
     void delete(Budget budget);
 
-    @Query("SELECT * FROM budgets")
-    List<Budget> getAllBudgets();
+    @Query("SELECT * FROM budgets WHERE id = :id")
+    Budget getBudgetById(int id);
 
-    @Query("SELECT * FROM budgets WHERE userId = :userId")
+    @Query("SELECT * FROM budgets ORDER BY name ASC")
+    List<Budget> getAllBudgets(); // Potentially for all users, or should be by userId
+
+    @Query("SELECT * FROM budgets WHERE name = :name AND period = :period LIMIT 1")
+    Budget getBudgetByNameAndPeriod(String name, String period); // Might also need userId
+
+    @Query("SELECT SUM(amount) FROM budgets WHERE userId = :userId") // Added for getTotalBudget
+    double getTotalBudgetByUserId(int userId);
+
+    @Query("SELECT * FROM budgets WHERE userId = :userId ORDER BY name ASC") // Added for getBudgetsByUserId
     List<Budget> getBudgetsByUserId(int userId);
-
-    @Query("SELECT SUM(amount) FROM budgets")
-    double getTotalBudget();
 }

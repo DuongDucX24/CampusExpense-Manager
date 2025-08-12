@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BTec - FPT"
+        android:text="BTEC - FPT"
         android:textSize="20sp"
         android:textColor="#E60E0E"
         android:layout_gravity="center_horizontal"
@@ -50,36 +50,23 @@
         android:layout_marginTop="10dp">
 
         <Button
+            android:id="@+id/btnLogin"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:backgroundTint="#E61717"
-            android:layout_weight="1"
-            android:layout_marginEnd="10dp"/>
-
-        <Button
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Login"
             android:layout_weight="1"
             android:backgroundTint="#0E86E4"
-            android:id="@+id/btnLogin" />
+            android:layout_marginEnd="5dp"/>
+
+        <Button
+            android:id="@+id/btnRegister"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_weight="1"
+            android:backgroundTint="#0E86E4"
+            android:layout_marginStart="5dp"/>
     </LinearLayout>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Do you have an account ?"
-        android:layout_gravity="center_horizontal"
-        android:textSize="15sp"
-        android:textStyle="bold|italic"
-        android:layout_marginTop="10dp"
-        android:id="@+id/tvRegisterAccount"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Forget password"
-        android:layout_gravity="center_horizontal"
-        android:textSize="15sp"/>
 </LinearLayout>

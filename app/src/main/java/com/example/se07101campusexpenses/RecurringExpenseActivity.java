@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import androidx.annotation.Nullable;
@@ -29,7 +30,7 @@ public class RecurringExpenseActivity extends AppCompatActivity {
 
         int userId = getCurrentUserId();
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<RecurringExpense> recurringExpenses = recurringExpenseDao.getRecurringExpensesByUser(userId);
+            List<RecurringExpense> recurringExpenses = recurringExpenseDao.getAllRecurringExpensesByUserId(userId); // Corrected method name
             runOnUiThread(() -> {
                 RecurringExpenseAdapter adapter = new RecurringExpenseAdapter(recurringExpenses);
                 rvRecurringExpenses.setAdapter(adapter);
@@ -40,7 +41,7 @@ public class RecurringExpenseActivity extends AppCompatActivity {
     }
 
     private int getCurrentUserId() {
-        // Implement logic to get the current user's ID
-        return 1; // Placeholder
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        return prefs.getInt("user_id", -1); // Return -1 or handle appropriately if not found
     }
 }

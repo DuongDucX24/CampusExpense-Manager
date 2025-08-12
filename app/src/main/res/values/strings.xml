@@ -19,4 +19,5 @@
         <item>Monthly</item>
     </string-array>
     <string name="date_range">%1$s to %2$s</string>
+    <string name="create_budget_button_text">Create Budget</string>
 </resources>

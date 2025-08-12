@@ -8,9 +8,9 @@ import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetDao;
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.model.Expense;
-import com.example.se07101campusexpenses.model.ExpenseDao;
+import com.example.se07101campusexpenses.database.ExpenseDao;
 import com.example.se07101campusexpenses.model.User;
-import com.example.se07101campusexpenses.model.UserDao;
+import com.example.se07101campusexpenses.database.UserDao;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,12 +81,12 @@ public class DatabaseTest {
 
         Budget budget = new Budget();
         budget.setUserId(retrievedUser.id);
-        budget.setCategory("Food");
+        budget.setName("Food");
         budget.setAmount(500.00);
         budgetDao.insert(budget);
 
         List<Budget> budgets = budgetDao.getBudgetsByUserId(retrievedUser.id);
         assertEquals(1, budgets.size());
-        assertEquals("Food", budgets.get(0).getCategory());
+        assertEquals("Food", budgets.get(0).getName());
     }
 }

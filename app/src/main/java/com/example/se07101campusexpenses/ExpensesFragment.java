@@ -10,13 +10,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+// import androidx.lifecycle.Observer; // No longer needed if not using LiveData here
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
-import com.example.se07101campusexpenses.database.AppDatabase;
+import com.example.se07101campusexpenses.database.AppDatabase; // Added for executor
+import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Expense;
-import com.example.se07101campusexpenses.model.ExpenseDao;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.List;
 
 public class ExpensesFragment extends Fragment {
 
-    private ExpenseDao expenseDao;
+    private ExpenseRepository expenseRepository;
     private ExpenseAdapter expenseAdapter;
     private final List<Expense> expenseList = new ArrayList<>();
     private int userId;
@@ -53,7 +54,7 @@ public class ExpensesFragment extends Fragment {
         FloatingActionButton fabAddExpense = view.findViewById(R.id.fabAddExpense);
 
         userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
-        expenseDao = AppDatabase.getInstance(getContext()).expenseDao();
+        expenseRepository = new ExpenseRepository(requireContext());
 
         recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(getContext()));
         expenseAdapter = new ExpenseAdapter(expenseList);
@@ -79,11 +80,13 @@ public class ExpensesFragment extends Fragment {
 
     private void loadExpenses() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<Expense> expenses = expenseDao.getExpensesByUserId(userId);
+            List<Expense> expenses = expenseRepository.getExpensesByUserId(userId);
             requireActivity().runOnUiThread(() -> {
-                expenseList.clear();
-                expenseList.addAll(expenses);
-                expenseAdapter.notifyItemRangeChanged(0, expenseList.size());
+                if (expenses != null) {
+                    expenseList.clear();
+                    expenseList.addAll(expenses);
+                    expenseAdapter.notifyDataSetChanged();
+                }
             });
         });
     }

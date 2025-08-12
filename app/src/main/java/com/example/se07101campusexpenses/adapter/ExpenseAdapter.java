@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.model.Expense;
 
+import java.text.NumberFormat; // Added import
 import java.util.List;
+import java.util.Locale; // Added import
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
 
     private List<Expense> expenseList;
     private OnItemClickListener listener;
+    private NumberFormat vndFormat; // Added for currency formatting
 
     public interface OnItemClickListener {
         void onItemClick(Expense expense);
@@ -28,6 +31,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     public ExpenseAdapter(List<Expense> expenseList) {
         this.expenseList = expenseList;
+        this.vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
+        this.vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
     }
 
     @NonNull
@@ -43,7 +48,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         Expense currentExpense = expenseList.get(position);
         holder.tvExpenseDescription.setText(currentExpense.description);
         holder.tvExpenseCategory.setText(currentExpense.category);
-        holder.tvExpenseAmount.setText(String.format("Amount: $%.2f", currentExpense.amount));
+        // Format expense amount using vndFormat
+        holder.tvExpenseAmount.setText(vndFormat.format(currentExpense.amount));
         holder.tvExpenseDate.setText(currentExpense.date);
 
         holder.itemView.setOnClickListener(v -> {
