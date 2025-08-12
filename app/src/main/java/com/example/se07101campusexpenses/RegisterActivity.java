@@ -15,7 +15,7 @@ import com.example.se07101campusexpenses.model.User; // Added for User model
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText edtRegisterUsername, edtRegisterPassword, edtConfirmPassword;
+    EditText edtRegisterUsername, edtRegisterPassword, edtConfirmPassword, edtEmail;
     Button btnPerformRegister, btnBackToLogin;
     private UserRepository userRepository;
 
@@ -29,53 +29,47 @@ public class RegisterActivity extends AppCompatActivity {
         edtRegisterUsername = findViewById(R.id.edtRegisterUsername);
         edtRegisterPassword = findViewById(R.id.edtRegisterPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
+        edtEmail = findViewById(R.id.edtEmail);
         btnPerformRegister = findViewById(R.id.btnPerformRegister);
         btnBackToLogin = findViewById(R.id.btnBackToLogin);
 
-        btnPerformRegister.setOnClickListener(v -> {
-            // Registration logic will go here
-            // performRegistration(); // We'll implement this next
-            Toast.makeText(RegisterActivity.this, "Register clicked (logic pending)", Toast.LENGTH_SHORT).show();
-        });
+        btnPerformRegister.setOnClickListener(v -> performRegistration());
 
-        btnBackToLogin.setOnClickListener(v -> {
-            finish(); // Go back to LoginActivity
-        });
+        btnBackToLogin.setOnClickListener(v -> finish()); // Go back to LoginActivity
     }
 
-    // private void performRegistration() {
-    //     String username = edtRegisterUsername.getText().toString().trim();
-    //     String password = edtRegisterPassword.getText().toString().trim();
-    //     String confirmPassword = edtConfirmPassword.getText().toString().trim();
+    private void performRegistration() {
+        String username = edtRegisterUsername.getText().toString().trim();
+        String password = edtRegisterPassword.getText().toString().trim();
+        String confirmPassword = edtConfirmPassword.getText().toString().trim();
+        String email = edtEmail.getText().toString().trim();
 
-    //     if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
-    //         Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-    //         return;
-    //     }
+        if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword) || TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-    //     if (!password.equals(confirmPassword)) {
-    //         Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-    //         return;
-    //     }
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-    //     // TODO: Implement secure password hashing here!
-    //     // For now, storing plaintext (NOT SECURE - FOR DEMO ONLY)
-    //     User newUser = new User(username, password); // HASH THE PASSWORD INSTEAD
+        // TODO: Implement secure password hashing here!
+        // For now, storing plaintext (NOT SECURE - FOR DEMO ONLY)
+        User newUser = new User(username, password, email); // HASH THE PASSWORD INSTEAD
 
-    //     AppDatabase.databaseWriteExecutor.execute(() -> {
-    //         // Check if user already exists
-    //         User existingUser = userRepository.getUserByUsername(username);
-    //         if (existingUser == null) {
-    //             userRepository.insert(newUser);
-    //             runOnUiThread(() -> {
-    //                 Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-    //                 finish(); // Go back to LoginActivity
-    //             });
-    //         } else {
-    //             runOnUiThread(() -> {
-    //                 Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
-    //             });
-    //         }
-    //     });
-    // }
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Check if user already exists
+            User existingUser = userRepository.getUserByUsername(username);
+            if (existingUser == null) {
+                userRepository.saveUserAccount(newUser);
+                runOnUiThread(() -> {
+                    Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                    finish(); // Go back to LoginActivity
+                });
+            } else {
+                runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
 }
