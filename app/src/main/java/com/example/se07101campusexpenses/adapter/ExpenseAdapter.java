@@ -6,20 +6,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.model.Expense;
 
-import java.text.NumberFormat; // Added import
+import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale; // Added import
+import java.util.Locale;
 
-public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder> {
+public class ExpenseAdapter extends ListAdapter<Expense, ExpenseAdapter.ExpenseViewHolder> {
 
-    private List<Expense> expenseList;
     private OnItemClickListener listener;
-    private NumberFormat vndFormat; // Added for currency formatting
+    private final NumberFormat vndFormat;
 
     public interface OnItemClickListener {
         void onItemClick(Expense expense);
@@ -29,11 +30,33 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         this.listener = listener;
     }
 
-    public ExpenseAdapter(List<Expense> expenseList) {
-        this.expenseList = expenseList;
-        this.vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
-        this.vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
+    public ExpenseAdapter() {
+        super(DIFF_CALLBACK);
+        this.vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        this.vndFormat.setMaximumFractionDigits(0);
     }
+
+    // Private method to update expense list for compatibility with existing code
+    // This method is not directly used in this class but may be called from outside
+    public void submitExpenseList(List<Expense> expenses) {
+        submitList(expenses);
+    }
+
+    // DiffUtil implementation for efficient updates
+    private static final DiffUtil.ItemCallback<Expense> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Expense oldItem, @NonNull Expense newItem) {
+            return oldItem.getId() == newItem.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Expense oldItem, @NonNull Expense newItem) {
+            return oldItem.getDescription().equals(newItem.getDescription()) &&
+                   oldItem.getCategory().equals(newItem.getCategory()) &&
+                   oldItem.getAmount() == newItem.getAmount() &&
+                   oldItem.getDate().equals(newItem.getDate());
+        }
+    };
 
     @NonNull
     @Override
@@ -45,30 +68,27 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
 
     @Override
     public void onBindViewHolder(@NonNull ExpenseViewHolder holder, int position) {
-        Expense currentExpense = expenseList.get(position);
-        holder.tvExpenseDescription.setText(currentExpense.description);
-        holder.tvExpenseCategory.setText(currentExpense.category);
-        // Format expense amount using vndFormat
-        holder.tvExpenseAmount.setText(vndFormat.format(currentExpense.amount));
-        holder.tvExpenseDate.setText(currentExpense.date);
+        Expense currentExpense = getItem(position);
+        holder.tvExpenseDescription.setText(currentExpense.getDescription());
+        holder.tvExpenseCategory.setText(currentExpense.getCategory());
+        holder.tvExpenseAmount.setText(vndFormat.format(currentExpense.getAmount()));
+        holder.tvExpenseDate.setText(currentExpense.getDate());
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(currentExpense);
             }
         });
-    }
 
-    @Override
-    public int getItemCount() {
-        return expenseList.size();
+        // Set stable IDs for animation stability
+        holder.itemView.setTag(currentExpense.getId());
     }
 
     static class ExpenseViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvExpenseDescription;
-        private TextView tvExpenseCategory;
-        private TextView tvExpenseAmount;
-        private TextView tvExpenseDate;
+        private final TextView tvExpenseDescription;
+        private final TextView tvExpenseCategory;
+        private final TextView tvExpenseAmount;
+        private final TextView tvExpenseDate;
 
         public ExpenseViewHolder(@NonNull View itemView) {
             super(itemView);

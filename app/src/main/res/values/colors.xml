@@ -48,6 +48,7 @@
 
     <color name="colorBackground">#FFFFFF</color>
     <color name="textColorPrimary">#000000</color>
+    <color name="textColorSecondary">#757575</color>
     <color name="colorButton">#FF6200EE</color>
     <color name="colorButtonText">#FFFFFF</color>
 

@@ -48,14 +48,28 @@ public interface ExpenseDao {
     @Query("SELECT category, SUM(amount) as amount FROM expenses WHERE userId = :userId GROUP BY category") // Added for sums per category for a user
     List<CategorySum> getCategorySumsByUserId(int userId);
 
-    // Placeholders for RecurringExpenseService needs
-    @Query("SELECT COUNT(*) > 0 FROM expenses WHERE description = :description AND userId = :userId AND SUBSTR(date, 1, 7) = :yearMonth")
-    boolean hasExpenseForMonth(String description, int userId, String yearMonth); // yearMonth format YYYY-MM
+    // Updated method signatures for RecurringExpenseService
+    @Query("SELECT COUNT(*) > 0 FROM expenses WHERE description = :description AND userId = :userId AND strftime('%Y-%m', date) = :year || '-' || printf('%02d', :month)")
+    boolean hasExpenseForMonth(String description, int userId, int year, int month);
 
+    @Query("SELECT COUNT(*) > 0 FROM expenses WHERE description = :description AND userId = :userId AND strftime('%Y-%W', date) = :year || '-' || printf('%02d', :week)")
+    boolean hasExpenseForWeek(String description, int userId, int year, int week);
 
     @Query("SELECT * FROM expenses WHERE date BETWEEN :startDate AND :endDate")
     List<Expense> getExpensesBetweenDates(String startDate, String endDate); // Global, or add userId
 
     @Query("SELECT category, SUM(amount) as amount FROM expenses WHERE date BETWEEN :startDate AND :endDate GROUP BY category")
     List<CategorySum> getExpensesByCategoryBetweenDates(String startDate, String endDate); // Global, or add userId
+
+    /**
+     * Gets expenses grouped by category between date range for a specific user
+     */
+    @Query("SELECT category, SUM(amount) as amount FROM expenses WHERE date BETWEEN :startDate AND :endDate AND userId = :userId GROUP BY category ORDER BY amount DESC")
+    List<CategorySum> getExpensesByCategoryBetweenDatesForUser(String startDate, String endDate, int userId);
+
+    /**
+     * Gets total expenses between date range for a specific user
+     */
+    @Query("SELECT SUM(amount) FROM expenses WHERE date BETWEEN :startDate AND :endDate AND userId = :userId")
+    Double getTotalExpensesBetweenDatesForUser(String startDate, String endDate, int userId);
 }

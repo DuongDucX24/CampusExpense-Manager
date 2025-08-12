@@ -16,7 +16,18 @@ public class UserRepository {
 
     public void saveUserAccount(final User user) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            userDao.insert(user);
+            // If the user has a valid ID (greater than 0), update instead of insert
+            if (user.getId() > 0) {
+                userDao.update(user);
+            } else {
+                userDao.insert(user);
+            }
+        });
+    }
+
+    public void updateUser(final User user) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            userDao.update(user);
         });
     }
 
@@ -25,6 +36,21 @@ public class UserRepository {
             @Override
             public User call() throws Exception {
                 return userDao.login(username, password);
+            }
+        });
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public User loginWithEmail(final String email, final String password) {
+        Future<User> future = AppDatabase.databaseWriteExecutor.submit(new Callable<User>() {
+            @Override
+            public User call() throws Exception {
+                return userDao.loginWithEmail(email, password);
             }
         });
         try {
@@ -50,6 +76,21 @@ public class UserRepository {
         }
     }
 
+    public User getUserByEmail(final String email) {
+        Future<User> future = AppDatabase.databaseWriteExecutor.submit(new Callable<User>() {
+            @Override
+            public User call() throws Exception {
+                return userDao.getUserByEmail(email);
+            }
+        });
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public User getUserById(final int userId) {
         Future<User> future = AppDatabase.databaseWriteExecutor.submit(() -> userDao.getUserById(userId));
         try {
@@ -57,6 +98,16 @@ public class UserRepository {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public int getUserCount() {
+        try {
+            Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(() -> userDao.getUserCount());
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 }

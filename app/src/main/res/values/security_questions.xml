@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="security_questions">
+        <item>In what city were you born?</item>
+        <item>What is the name of your first pet?</item>
+        <item>What was your childhood nickname?</item>
+        <item>What was your favorite food as a child?</item>
+        <item>What is the name of your favorite teacher?</item>
+        <item>What was the model of your first car?</item>
+        <item>What is your mother\'s maiden name?</item>
+        <item>What is the name of your elementary school?</item>
+    </string-array>
+</resources>
+

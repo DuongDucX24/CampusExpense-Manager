@@ -25,7 +25,7 @@
         android:layout_height="55dp"
         android:autofillHints="false"
         android:background="#04DCF4"
-        android:hint="Enter username"
+        android:hint="Enter username or email"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:layout_marginTop="10dp"
@@ -69,4 +69,17 @@
             android:backgroundTint="#0E86E4"
             android:layout_marginStart="5dp"/>
     </LinearLayout>
+
+    <!-- Forgot Password Button -->
+    <TextView
+        android:id="@+id/tvForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forgot Password?"
+        android:textColor="#0E86E4"
+        android:layout_gravity="center_horizontal"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:focusable="true" />
 </LinearLayout>

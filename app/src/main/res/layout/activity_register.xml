@@ -5,7 +5,14 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- TextView for "Registration Screen" is removed -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/edtRegisterUsername"
@@ -14,6 +21,33 @@
         android:hint="Username"
         android:inputType="text"
         android:minHeight="48dp"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- Username requirement -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• Username must be at least 3 characters long"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:minHeight="48dp"
+        android:layout_marginBottom="10dp"/>
+        
+    <!-- Email requirement -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• Email must be in a valid format (e.g., user@example.com)"
+        android:textSize="12sp"
+        android:textColor="#555555"
         android:layout_marginBottom="10dp"/>
 
     <EditText
@@ -34,14 +68,56 @@
         android:minHeight="48dp"
         android:layout_marginBottom="10dp"/>
 
-    <EditText
-        android:id="@+id/edtEmail"
+    <!-- Password requirements -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
+        android:text="Password Requirements:"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginBottom="5dp"/>
+        
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• At least 6 characters long\n• Contains at least one special character\n• Passwords must match"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Security Question Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Security Question:"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginBottom="5dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerSecurityQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:minHeight="48dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/edtSecurityAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Answer to security question"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Security answer requirement -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="• Security answer is case-sensitive and required for password recovery"
+        android:textSize="12sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/btnPerformRegister"

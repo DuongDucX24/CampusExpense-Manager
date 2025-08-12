@@ -1,28 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment"
-    android:padding="16dp">
+    android:background="@color/colorBackground"
+    tools:context="fragments.HomeFragment">
 
-    <TextView
-        android:id="@+id/tvTotalSpending"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total Spending: $0.00"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:background="@color/colorBackground"
+        android:elevation="0dp">
 
-    <TextView
-        android:id="@+id/tvRemainingBudget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Remaining Budget: $0.00"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
+            <TextView
+                android:id="@+id/tvHomeHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/textColorPrimary" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvHomeSubheader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Your financial overview at a glance"
+                android:textSize="14sp"
+                android:textColor="@color/textColorSecondary" />
+
+            <!-- Financial Summary Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardFinancialSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Financial Summary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="12dp">
+
+                        <!-- Total Spending -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Total Spending:"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tvTotalSpending"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="₫0"
+                                android:textSize="16sp"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Remaining Budget -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Remaining Budget:"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tvRemainingBudget"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="₫0"
+                                android:textSize="16sp"
+                                android:textColor="@color/colorAccent"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Budget Utilization Progress -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Budget Utilization"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp" />
+
+                        <ProgressBar
+                            android:id="@+id/progressBudget"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:progress="0"
+                            android:max="100" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Quick Actions Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardQuickActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quick Actions"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Add Expense Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddExpense"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add Expense"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        app:icon="@android:drawable/ic_input_add"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Add Budget Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddBudget"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add Budget"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        app:icon="@android:drawable/ic_input_add"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="8dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Reports & Analysis Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardReportsAnalysis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reports &amp; Analysis"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Expense Overview Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExpenseOverview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Expense Overview"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        app:icon="@android:drawable/ic_menu_view"
+                        app:iconGravity="textStart"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Expense Report Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExpenseReport"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Expense Report"
+                        android:textColor="@color/white"
+                        android:padding="12dp"
+                        app:icon="@android:drawable/ic_menu_report_image"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Recent Expenses Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Recent Expenses"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Recent expenses will be added dynamically -->
+            <LinearLayout
+                android:id="@+id/recentExpensesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Empty state message -->
+                <TextView
+                    android:id="@+id/tvNoRecentExpenses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No recent expenses"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:textColor="@color/textColorSecondary"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

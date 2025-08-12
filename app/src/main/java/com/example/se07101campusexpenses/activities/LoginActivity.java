@@ -5,9 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-// import android.widget.TextView; // TextView import no longer needed for btnRegister
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,10 +25,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 public class LoginActivity extends AppCompatActivity {
-    EditText edtUsername, edtPassword;
+    EditText edtUsernameOrEmail, edtPassword; // Changed from edtUsername to edtUsernameOrEmail
     Button btnLogin;
     private UserRepository userRepository;
-    Button btnRegister; // Changed from TextView to Button
+    Button btnRegister;
+    TextView tvForgotPassword; // Added TextView for forgot password link
 
     // Preference keys
     private static final String PREFS_NAME = "user_prefs";
@@ -53,24 +55,50 @@ public class LoginActivity extends AppCompatActivity {
         // User is not logged in, proceed with login layout
         setContentView(R.layout.activity_login);
         edtPassword = findViewById(R.id.edtPassword);
-        edtUsername = findViewById(R.id.edtUsername);
+        edtUsernameOrEmail = findViewById(R.id.edtUsername); // ID in layout is still edtUsername
         btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister); // This should now resolve
+        btnRegister = findViewById(R.id.btnRegister);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword); // Initialize the forgot password TextView
+
         userRepository = new UserRepository(this);
         setupLoginButton();
 
-        btnRegister.setOnClickListener(v -> { // Listener now on btnRegister
+        // Change hint to indicate that email can be used too
+        edtUsernameOrEmail.setHint("Username or Email");
+
+        // Check if there are any users in the database
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            int userCount = userRepository.getUserCount();
+            runOnUiThread(() -> {
+                if (userCount == 0) {
+                    // Disable forgot password if no users exist
+                    tvForgotPassword.setEnabled(false);
+                    tvForgotPassword.setAlpha(0.5f); // Visual indication that it's disabled
+                } else {
+                    tvForgotPassword.setEnabled(true);
+                    tvForgotPassword.setAlpha(1.0f);
+                }
+            });
+        });
+
+        btnRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
+        // Add click listener for forgot password link
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
     }
 
     private void setupLoginButton() {
         btnLogin.setOnClickListener(v -> {
-            String username = edtUsername.getText().toString().trim();
+            String usernameOrEmail = edtUsernameOrEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
-            if (TextUtils.isEmpty(username)) {
-                edtUsername.setError("Enter username");
+            if (TextUtils.isEmpty(usernameOrEmail)) {
+                edtUsernameOrEmail.setError("Enter username or email");
                 return;
             }
             if (TextUtils.isEmpty(password)) {
@@ -78,29 +106,49 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            AppDatabase.databaseWriteExecutor.execute(() -> {
-                User user = userRepository.getUserByUsername(username);
-                runOnUiThread(() -> {
-                    try {
-                        if (user != null && PasswordUtils.verifyPassword(password, user.getPassword())) {
-                            // Save user ID to SharedPreferences
-                            SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putInt(KEY_USER_ID, user.id);
-                            editor.apply();
+            // Determine if input is email or username
+            boolean isEmail = Patterns.EMAIL_ADDRESS.matcher(usernameOrEmail).matches();
 
-                            Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                        Log.e("LoginActivity", "Error during login", e);
-                        Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show();
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                User user = null;
+                try {
+                    if (isEmail) {
+                        // Try to get user by email
+                        user = userRepository.getUserByEmail(usernameOrEmail);
+                    } else {
+                        // Try to get user by username
+                        user = userRepository.getUserByUsername(usernameOrEmail);
                     }
-                });
+
+                    // Verify password if user exists
+                    final User finalUser = user;
+                    runOnUiThread(() -> {
+                        try {
+                            if (finalUser != null && PasswordUtils.verifyPassword(password, finalUser.getPassword())) {
+                                // Save user ID to SharedPreferences
+                                SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putInt(KEY_USER_ID, finalUser.id);
+                                editor.apply();
+
+                                Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Invalid username/email or password", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                            Log.e("LoginActivity", "Error during login", e);
+                            Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("LoginActivity", "Error during login process", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show();
+                    });
+                }
             });
         });
     }
