@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.adapter.RecurringExpenseAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.RecurringExpenseDao;

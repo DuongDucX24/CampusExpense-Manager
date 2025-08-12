@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses.budget;
+package com.example.se07101campusexpenses.activities;
 
 import android.os.Bundle;
 import android.text.TextUtils;

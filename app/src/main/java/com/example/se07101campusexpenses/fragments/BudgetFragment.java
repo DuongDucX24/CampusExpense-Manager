@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.se07101campusexpenses.R;
+import com.example.se07101campusexpenses.activities.AddBudgetActivity;
+import com.example.se07101campusexpenses.activities.EditBudgetActivity;
 import com.example.se07101campusexpenses.adapter.BudgetRVAdapter;
-import com.example.se07101campusexpenses.budget.AddBudgetActivity;
-import com.example.se07101campusexpenses.budget.EditBudgetActivity;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.model.Budget;

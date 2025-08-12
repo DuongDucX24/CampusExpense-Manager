@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.activities;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -7,6 +7,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.RecurringExpenseDao;
 import com.example.se07101campusexpenses.model.RecurringExpense;

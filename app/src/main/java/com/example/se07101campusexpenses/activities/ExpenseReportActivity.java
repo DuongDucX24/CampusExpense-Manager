@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.activities;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -8,15 +8,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.adapter.ExpenseReportAdapter;
 import com.example.se07101campusexpenses.model.Expense;
 import com.example.se07101campusexpenses.model.CategorySum; // Import CategorySum
 import com.example.se07101campusexpenses.database.ExpenseRepository;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter; // Added import
 
 import java.text.NumberFormat; // Added import
 import java.util.ArrayList;
@@ -28,7 +25,6 @@ public class ExpenseReportActivity extends AppCompatActivity {
     private EditText etStartDate, etEndDate;
     private RecyclerView rvReport;
     private TextView tvReportTotal;
-    private PieChart reportPieChart;
     private ExpenseRepository expenseRepository;
     private NumberFormat vndFormat; // Added for currency formatting
 
@@ -45,7 +41,6 @@ public class ExpenseReportActivity extends AppCompatActivity {
         Button btnGenerateReport = findViewById(R.id.btnGenerateReport);
         rvReport = findViewById(R.id.rvReport);
         tvReportTotal = findViewById(R.id.tvReportTotal);
-        reportPieChart = findViewById(R.id.reportPieChart);
 
         expenseRepository = new ExpenseRepository(this); // Application context might be better for repository
         rvReport.setLayoutManager(new LinearLayoutManager(this));
@@ -70,34 +65,7 @@ public class ExpenseReportActivity extends AppCompatActivity {
         }
         tvReportTotal.setText("Total Expenses: " + vndFormat.format(total)); // Use VND format
 
-        setupPieChart(startDate, endDate);
     }
 
-    private void setupPieChart(String startDate, String endDate) {
-        List<PieEntry> entries = new ArrayList<>();
-        // Updated to use CategorySum
-        List<CategorySum> categorySums = expenseRepository.getExpensesByCategoryBetweenDates(startDate, endDate);
 
-        for (CategorySum sum : categorySums) {
-            entries.add(new PieEntry((float) sum.amount, sum.category));
-        }
-
-        PieDataSet dataSet = new PieDataSet(entries, "Expenses by Category");
-        // TODO: Add colors to PieDataSet for better visualization
-        // dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-
-        // Format slice values as VND
-        dataSet.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return vndFormat.format(value);
-            }
-        });
-        dataSet.setValueTextSize(12f);
-
-        PieData pieData = new PieData(dataSet);
-        reportPieChart.setData(pieData);
-        reportPieChart.getDescription().setEnabled(false);
-        reportPieChart.invalidate(); // refresh
-    }
 }

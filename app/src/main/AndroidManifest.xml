@@ -21,19 +21,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Design.Light.NoActionBar"
         tools:targetApi="31">
-        <activity android:name=".MenuActivity"/>
-        <activity android:name=".RegisterActivity"/>
-        <activity android:name=".RecurringExpenseActivity"/>
-        <activity android:name=".AddRecurringExpenseActivity"/>
+        <activity android:name=".activities.MenuActivity"/>
+        <activity android:name=".activities.RegisterActivity"/>
+        <activity android:name=".activities.RecurringExpenseActivity"/>
+        <activity android:name=".activities.AddRecurringExpenseActivity"/>
         <service android:name=".service.RecurringExpenseService" />
         <service android:name=".service.NotificationService" />
-        <activity android:name=".ExpenseReportActivity"/>
-        <activity android:name=".budget.AddBudgetActivity"/>
-        <activity android:name=".budget.EditBudgetActivity"/>
-        <activity android:name=".AddExpenseActivity"/>
-        <activity android:name=".EditExpenseActivity"/>
+        <activity android:name=".activities.ExpenseReportActivity"/>
+        <activity android:name=".activities.AddBudgetActivity"/>
+        <activity android:name=".activities.EditBudgetActivity"/>
+        <activity android:name=".activities.AddExpenseActivity"/>
+        <activity android:name=".activities.EditExpenseActivity"/>
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

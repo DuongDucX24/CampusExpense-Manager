@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-// import androidx.lifecycle.Observer; // No longer needed if not using LiveData here
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.se07101campusexpenses.R;
+import com.example.se07101campusexpenses.activities.AddExpenseActivity;
+import com.example.se07101campusexpenses.activities.EditExpenseActivity;
 import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase; // Added for executor
 import com.example.se07101campusexpenses.database.ExpenseRepository;

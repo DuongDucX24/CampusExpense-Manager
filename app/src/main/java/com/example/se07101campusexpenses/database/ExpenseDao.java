@@ -52,10 +52,6 @@ public interface ExpenseDao {
     @Query("SELECT COUNT(*) > 0 FROM expenses WHERE description = :description AND userId = :userId AND SUBSTR(date, 1, 7) = :yearMonth")
     boolean hasExpenseForMonth(String description, int userId, String yearMonth); // yearMonth format YYYY-MM
 
-    // Week checking is more complex with SUBSTR and depends on SQLite date functions available/used
-    // For simplicity, this is a placeholder and might need a more robust date checking strategy.
-    // @Query("SELECT COUNT(*) > 0 FROM expenses WHERE description = :description AND userId = :userId AND strftime('%Y-%W', date) = :yearWeek")
-    // boolean hasExpenseForWeek(String description, int userId, String yearWeek); // yearWeek format YYYY-WW
 
     @Query("SELECT * FROM expenses WHERE date BETWEEN :startDate AND :endDate")
     List<Expense> getExpensesBetweenDates(String startDate, String endDate); // Global, or add userId

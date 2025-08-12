@@ -6,4 +6,47 @@
     </style>
 
     <style name="Theme.SE07101CampusExpenses" parent="Base.Theme.SE07101CampusExpenses" />
-</resources>
+
+    <!-- Custom CardView style for consistent corners and elevation -->
+    <style name="Widget.App.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <!-- Custom Toolbar style -->
+    <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+        <item name="android:background">?attr/colorSurface</item> <!-- Use surface for toolbar -->
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Toolbar" parent="">
+        <item name="colorControlNormal">?attr/colorOnSurface
+        </item> <!-- Icon color for navigation icon, overflow -->
+    </style>
+
+
+    <!-- Custom BottomNavigationView style -->
+    <style name="Widget.App.BottomNavigationView"
+        parent="Widget.MaterialComponents.BottomNavigationView.PrimarySurface">
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="itemIconTint">@color/bottom_nav_item_tint_selector</item>
+        <item name="itemTextColor">@color/bottom_nav_item_tint_selector</item>
+        <item name="labelVisibilityMode">labeled</item> <!-- Or auto, selected, unlabeled -->
+    </style>
+
+    <!-- Default Button Style Definition (can be customized further) -->
+    <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="cornerRadius">8dp</item>
+        <!-- Add other button attributes like backgroundTint, strokeColor if needed for a global style -->
+    </style>
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item> <!-- Common modern choice -->
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+        </resources>

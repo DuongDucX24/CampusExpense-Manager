@@ -6,10 +6,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.se07101campusexpenses.BudgetFragment;
-import com.example.se07101campusexpenses.ExpensesFragment;
-import com.example.se07101campusexpenses.HomeFragment;
-import com.example.se07101campusexpenses.ProfileFragment;
+import com.example.se07101campusexpenses.fragments.BudgetFragment;
+import com.example.se07101campusexpenses.fragments.ExpensesFragment;
+import com.example.se07101campusexpenses.fragments.HomeFragment;
+import com.example.se07101campusexpenses.fragments.ProfileFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
     public ViewPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {

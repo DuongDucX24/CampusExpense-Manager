@@ -1,15 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFC107</color> <!-- Amber -->
-    <color name="colorPrimaryDark">#FFA000</color> <!-- Darker Amber -->
-    <color name="colorAccent">#03A9F4</color> <!-- Light Blue -->
-    <color name="colorDelete">#D32F2F</color> <!-- Dark Red -->
-    <color name="colorTextWhite">#FFFFFF</color> <!-- White -->
-    <color name="textColorPrimary">#212121</color> <!-- Almost Black -->
-    <color name="textColorSecondary">#757575</color> <!-- Medium Gray -->
-    <color name="colorBackground">#FAFAFA</color> <!-- Very Light Gray -->
-    <color name="colorButton">#FFC107</color> <!-- Amber -->
-    <color name="colorButtonText">#212121</color>
+    <!-- Primary Colors -->
+    <color name="md_theme_primary">#445E91</color> <!-- A modern, muted blue -->
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#D8E2FF</color>
+    <color name="md_theme_onPrimaryContainer">#001A41</color>
+
+    <!-- Secondary Colors -->
+    <color name="md_theme_secondary">#575E71</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#DBE2F9</color>
+    <color name="md_theme_onSecondaryContainer">#141B2C</color>
+
+    <!-- Tertiary Colors -->
+    <color name="md_theme_tertiary">#715573</color>
+    <color name="md_theme_onTertiary">#FFFFFF</color>
+    <color name="md_theme_tertiaryContainer">#FBD7FC</color>
+    <color name="md_theme_onTertiaryContainer">#29132D</color>
+
+    <!-- Error Colors -->
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+    <color name="md_theme_errorContainer">#FFDAD6</color>
+    <color name="md_theme_onErrorContainer">#410002</color>
+
+    <!-- Background Colors -->
+    <color name="md_theme_background">#FEFBFF</color>
+    <color name="md_theme_onBackground">#1B1B1F</color>
+
+    <!-- Surface Colors -->
+    <color name="md_theme_surface">#FEFBFF</color>
+    <color name="md_theme_onSurface">#1B1B1F</color>
+    <color name="md_theme_surfaceVariant">#E1E2EC</color>
+    <color name="md_theme_onSurfaceVariant">#44474F</color>
+
+    <!-- Outline Color -->
+    <color name="md_theme_outline">#74777F</color>
+
+    <!-- Your existing colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="black">#FF000000</color> <!-- Almost Black -->
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="textColorPrimary">#000000</color>
+    <color name="colorButton">#FF6200EE</color>
+    <color name="colorButtonText">#FFFFFF</color>
+
+    <!-- Newly added/verified colors -->
+    <color name="colorAccent">@color/md_theme_secondary</color> <!-- Using Material 3 secondary as accent -->
+    <color name="colorDelete">@color/md_theme_error</color> <!-- Using Material 3 error color -->
+    <color name="colorTextWhite">#FFFFFF</color>
+
 </resources>

@@ -1,4 +1,4 @@
-package com.example.se07101campusexpenses;
+package com.example.se07101campusexpenses.activities;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -11,34 +11,33 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Expense;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
-public class EditExpenseActivity extends AppCompatActivity {
+public class AddExpenseActivity extends AppCompatActivity {
 
     private EditText edtExpenseDescription, edtExpenseAmount, edtExpenseDate;
     private Spinner spinnerExpenseCategory;
-
     private ExpenseRepository expenseRepository;
-    private Expense expense;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_expense);
+        setContentView(R.layout.activity_add_expense);
 
         expenseRepository = new ExpenseRepository(this);
+        userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
 
         edtExpenseDescription = findViewById(R.id.edtExpenseDescription);
         edtExpenseAmount = findViewById(R.id.edtExpenseAmount);
         edtExpenseDate = findViewById(R.id.edtExpenseDate);
         spinnerExpenseCategory = findViewById(R.id.spinnerExpenseCategory);
         Button btnSaveExpense = findViewById(R.id.btnSaveExpense);
-        Button btnDeleteExpense = findViewById(R.id.btnDeleteExpense);
         Button btnBackExpense = findViewById(R.id.btnBackExpense);
 
         // Category Spinner
@@ -50,23 +49,8 @@ public class EditExpenseActivity extends AppCompatActivity {
         // Date Pickers
         edtExpenseDate.setOnClickListener(v -> showDatePickerDialog(edtExpenseDate));
 
-        // Get expense from intent
-        expense = (Expense) getIntent().getSerializableExtra("expense");
-        if (expense != null) {
-            populateFields();
-        }
-
         btnSaveExpense.setOnClickListener(v -> saveExpense());
-        btnDeleteExpense.setOnClickListener(v -> deleteExpense());
         btnBackExpense.setOnClickListener(v -> finish());
-    }
-
-    private void populateFields() {
-        edtExpenseDescription.setText(expense.getDescription());
-        edtExpenseAmount.setText(String.valueOf(expense.getAmount()));
-        edtExpenseDate.setText(expense.getDate());
-        String[] categories = getResources().getStringArray(R.array.expense_categories);
-        spinnerExpenseCategory.setSelection(Arrays.asList(categories).indexOf(expense.getCategory()));
     }
 
     private void showDatePickerDialog(final EditText editText) {
@@ -96,29 +80,20 @@ public class EditExpenseActivity extends AppCompatActivity {
 
         double amount = Double.parseDouble(amountStr);
 
+        Expense expense = new Expense();
         expense.setDescription(description);
         expense.setAmount(amount);
         expense.setDate(date);
         expense.setCategory(category);
+        expense.setUserId(userId);
+        expense.setRecurring(false); // Assuming non-recurring for this form
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            expenseRepository.updateExpense(expense);
+            expenseRepository.addExpense(expense);
             runOnUiThread(() -> {
-                Toast.makeText(this, "Expense updated successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Expense saved successfully", Toast.LENGTH_SHORT).show();
                 finish();
             });
         });
-    }
-
-    private void deleteExpense() {
-        if (expense != null) {
-            AppDatabase.databaseWriteExecutor.execute(() -> {
-                expenseRepository.deleteExpense(expense.getId());
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "Expense deleted successfully", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-            });
-        }
     }
 }
