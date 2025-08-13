@@ -34,6 +34,8 @@
         <activity android:name=".activities.EditBudgetActivity"/>
         <activity android:name=".activities.AddExpenseActivity"/>
         <activity android:name=".activities.EditExpenseActivity"/>
+        <activity android:name=".activities.AllExpensesActivity"/>
+        <activity android:name=".activities.AllBudgetsActivity"/>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true">

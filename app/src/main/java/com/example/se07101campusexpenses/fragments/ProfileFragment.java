@@ -64,12 +64,11 @@ public class ProfileFragment extends Fragment {
     }
     
     /**
-     * Opens the email app with a pre-filled feedback message template
+     * Opens the Gmail app with a pre-filled feedback message template
      */
     private void sendFeedback() {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{SUPPORT_EMAIL});
+        intent.setData(Uri.parse("mailto:" + SUPPORT_EMAIL));
         intent.putExtra(Intent.EXTRA_SUBJECT, "CampusExpense Manager Feedback");
         intent.putExtra(Intent.EXTRA_TEXT, 
                 "Hello,\n\nI would like to provide the following feedback about the CampusExpense Manager app:\n\n" +
@@ -80,10 +79,20 @@ public class ProfileFragment extends Fragment {
                 "- App version: " + getAppVersion() + "\n\n" +
                 "Thank you!");
         
-        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+        // Try to specifically open Gmail
+        intent.setPackage("com.google.android.gm");
+
+        try {
             startActivity(intent);
-        } else {
-            Toast.makeText(requireContext(), "No email app found", Toast.LENGTH_SHORT).show();
+        } catch (android.content.ActivityNotFoundException ex) {
+            // If Gmail is not installed, try any email app
+            intent.setPackage(null);
+            if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                startActivity(intent);
+                Toast.makeText(requireContext(), "Gmail not found, opening default email app", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "No email app found", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     

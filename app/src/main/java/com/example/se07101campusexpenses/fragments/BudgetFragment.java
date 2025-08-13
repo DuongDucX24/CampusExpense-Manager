@@ -13,13 +13,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.activities.AddBudgetActivity;
+import com.example.se07101campusexpenses.activities.AllBudgetsActivity;
 import com.example.se07101campusexpenses.activities.EditBudgetActivity;
 import com.example.se07101campusexpenses.adapter.BudgetRVAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
@@ -39,10 +39,13 @@ public class BudgetFragment extends Fragment {
     private final List<Budget> budgetList = new ArrayList<>();
     private BudgetRepository budgetRepository;
     private int userId;
-    private TextView tvTotalBudget, tvBudgetCount;
-    private LinearLayout emptyStateBudget;
-    private ConstraintLayout contentLayout;
+    private TextView tvTotalBudget, tvAvailableBudget;
+    private LinearLayout emptyStateContainer;
+    private LinearLayout contentLayout;
+    private LinearLayout budgetsContainer;
+    private TextView tvShowMoreBudgets;
     private NumberFormat vndFormat;
+    private static final int MAX_ITEMS_TO_SHOW = 4;
 
     public BudgetFragment() {
         // Required empty public constructor
@@ -69,24 +72,22 @@ public class BudgetFragment extends Fragment {
         try {
             // Find views from the new layout
             FloatingActionButton fabAddBudget = view.findViewById(R.id.fabAddBudget);
-            RecyclerView budgetRv = view.findViewById(R.id.rvBudget);
             tvTotalBudget = view.findViewById(R.id.tvTotalBudget);
-            tvBudgetCount = view.findViewById(R.id.tvBudgetCount);
-            emptyStateBudget = view.findViewById(R.id.emptyStateBudget);
+            tvAvailableBudget = view.findViewById(R.id.tvAvailableBudget);
+            emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
             contentLayout = view.findViewById(R.id.contentLayout);
+            budgetsContainer = view.findViewById(R.id.budgetsContainer);
+            tvShowMoreBudgets = view.findViewById(R.id.tvShowMoreBudgets);
 
             userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
             budgetRepository = new BudgetRepository(requireContext());
 
+            // Set up the budgetRVAdapter (we'll use it differently now)
             budgetRVAdapter = new BudgetRVAdapter(budgetList, getContext());
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
-            budgetRv.setLayoutManager(linearLayoutManager);
-            budgetRv.setAdapter(budgetRVAdapter);
 
-            // Corrected lambda to match OnClickListener interface (int position, Budget budget)
-            budgetRVAdapter.setOnClickListener((position, budget) -> {
-                Intent intent = new Intent(getActivity(), EditBudgetActivity.class);
-                intent.putExtra("budget", budget);
+            // Set up click listener for "Show More" button
+            tvShowMoreBudgets.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AllBudgetsActivity.class);
                 startActivity(intent);
             });
 
@@ -117,10 +118,10 @@ public class BudgetFragment extends Fragment {
                 try {
                     // Clear the current list
                     budgetList.clear();
-
+                    
                     // Get updated budgets for the current user
                     List<Budget> userBudgets = budgetRepository.getBudgetsByUserId(userId);
-
+                    
                     // Calculate the total budget amount
                     double totalBudget = 0;
                     if (userBudgets != null) {
@@ -138,18 +139,18 @@ public class BudgetFragment extends Fragment {
                     if (isAdded() && getActivity() != null) {
                         requireActivity().runOnUiThread(() -> {
                             try {
-                                // Update UI
-                                budgetRVAdapter.notifyDataSetChanged();
+                                // Update UI with the new data
+                                updateBudgetDisplay(isEmpty);
 
                                 // Update summary data
                                 tvTotalBudget.setText(vndFormat.format(finalTotalBudget));
-                                tvBudgetCount.setText(String.valueOf(budgetList.size()));
+                                tvAvailableBudget.setText(vndFormat.format(finalTotalBudget)); // You might want to subtract expenses here
 
                                 // Toggle visibility based on data presence
                                 toggleEmptyState(isEmpty);
-
+                                
                             } catch (Exception e) {
-                                Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
+                                Log.e(TAG, "Error updating UI with budget data: " + e.getMessage(), e);
                             }
                         });
                     }
@@ -158,16 +159,62 @@ public class BudgetFragment extends Fragment {
                 }
             });
         } catch (Exception e) {
-            Log.e(TAG, "Error executing budget load: " + e.getMessage(), e);
+            Log.e(TAG, "Error executing budget loading task: " + e.getMessage(), e);
         }
+    }
+
+    private void updateBudgetDisplay(boolean isEmpty) {
+        if (!isEmpty) {
+            // Clear previous views
+            budgetsContainer.removeAllViews();
+
+            // Determine how many items to show
+            int itemsToShow = Math.min(budgetList.size(), MAX_ITEMS_TO_SHOW);
+
+            // Add budget items to the container
+            for (int i = 0; i < itemsToShow; i++) {
+                Budget budget = budgetList.get(i);
+                View budgetItemView = createBudgetItemView(budget);
+                budgetsContainer.addView(budgetItemView);
+            }
+
+            // Show or hide the "Show More" button
+            tvShowMoreBudgets.setVisibility(budgetList.size() > MAX_ITEMS_TO_SHOW ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private View createBudgetItemView(Budget budget) {
+        // Inflate a simple item view for each budget
+        View itemView = getLayoutInflater().inflate(R.layout.item_budget, null);
+
+        // Set budget data to the view
+        TextView tvCategory = itemView.findViewById(R.id.tvBudgetCategory);
+        TextView tvAmount = itemView.findViewById(R.id.tvBudgetAmount);
+        TextView tvPeriod = itemView.findViewById(R.id.tvBudgetPeriod);
+        TextView tvDescription = itemView.findViewById(R.id.tvBudgetDescription);
+
+        // Populate the views with data
+        tvCategory.setText(budget.getName());
+        tvAmount.setText(vndFormat.format(budget.getAmount()));
+        tvPeriod.setText(budget.getPeriod());
+        tvDescription.setText(budget.getDescription() != null ? budget.getDescription() : "");
+
+        // Add click listener to open budget details
+        itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), EditBudgetActivity.class);
+            intent.putExtra("budget", budget);
+            startActivity(intent);
+        });
+
+        return itemView;
     }
 
     private void toggleEmptyState(boolean isEmpty) {
         if (isEmpty) {
-            emptyStateBudget.setVisibility(View.VISIBLE);
+            emptyStateContainer.setVisibility(View.VISIBLE);
             contentLayout.setVisibility(View.GONE);
         } else {
-            emptyStateBudget.setVisibility(View.GONE);
+            emptyStateContainer.setVisibility(View.GONE);
             contentLayout.setVisibility(View.VISIBLE);
         }
     }

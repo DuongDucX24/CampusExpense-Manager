@@ -4,13 +4,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,25 +24,16 @@ import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.CategorySum;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class ExpenseOverviewActivity extends AppCompatActivity {
 
@@ -46,10 +41,9 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
 
     // Views
     private TextView tvTotalSpending, tvTotalBudget, tvRemainingBudget;
-    private TextView tvNoCategoryData, tvNoTrendData;
+    private TextView tvNoCategoryData;
     private ProgressBar progressBudget;
     private PieChart pieChart;
-    private LineChart lineChart;
     private RecyclerView rvCategoryBreakdown;
     private Button btnViewDetailedReport;
 
@@ -65,6 +59,15 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_overview);
+
+        // Setup toolbar with back button
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Expense Overview");
+        }
 
         vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         vndFormat.setMaximumFractionDigits(0);
@@ -89,6 +92,15 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         loadExpenseData();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void initializeViews() {
         tvTotalSpending = findViewById(R.id.tvTotalSpending);
         tvTotalBudget = findViewById(R.id.tvTotalBudget);
@@ -99,8 +111,6 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         rvCategoryBreakdown = findViewById(R.id.rvCategoryBreakdown);
         rvCategoryBreakdown.setLayoutManager(new LinearLayoutManager(this));
         rvCategoryBreakdown.setNestedScrollingEnabled(false);
-        tvNoTrendData = findViewById(R.id.tvNoTrendData);
-        lineChart = findViewById(R.id.lineChart);
         btnViewDetailedReport = findViewById(R.id.btnViewDetailedReport);
     }
 
@@ -112,12 +122,10 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
                 double remainingBudget = totalBudget - totalSpending;
 
                 List<CategorySum> categoryData = expenseRepository.getExpensesByCategoryForCurrentMonth(userId);
-                Map<String, Double> monthlyTotals = expenseRepository.getMonthlyTotalsForLastSixMonths(userId);
 
                 runOnUiThread(() -> {
                     updateSummary(totalSpending, totalBudget, remainingBudget);
                     updateCategoryBreakdown(categoryData);
-                    updateTrends(monthlyTotals);
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Error loading expense data: " + e.getMessage(), e);
@@ -182,81 +190,5 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         pieChart.setCenterText("Expenses by Category");
         pieChart.setDrawEntryLabels(false);
         pieChart.invalidate();
-    }
-
-    private void updateTrends(Map<String, Double> monthlyTotals) {
-        if (monthlyTotals == null || monthlyTotals.size() < 2) {
-            tvNoTrendData.setVisibility(View.VISIBLE);
-            lineChart.setVisibility(View.GONE);
-            return;
-        }
-
-        tvNoTrendData.setVisibility(View.GONE);
-        lineChart.setVisibility(View.VISIBLE);
-
-        setupLineChart(monthlyTotals);
-    }
-
-    private void setupLineChart(Map<String, Double> monthlyTotals) {
-        List<Entry> entries = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-
-        // Process entries in order they appear in the map (chronological if using LinkedHashMap)
-        int index = 0;
-        for (Map.Entry<String, Double> entry : monthlyTotals.entrySet()) {
-            entries.add(new Entry(index, entry.getValue().floatValue()));
-            labels.add(entry.getKey());
-            index++;
-        }
-
-        if (entries.isEmpty()) {
-            tvNoTrendData.setVisibility(View.VISIBLE);
-            lineChart.setVisibility(View.GONE);
-            return;
-        }
-
-        // Create dataset with improved styling
-        LineDataSet dataSet = new LineDataSet(entries, "Monthly Expenses");
-        dataSet.setColor(Color.BLUE);
-        dataSet.setLineWidth(2f);
-        dataSet.setCircleColor(Color.BLUE);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleRadius(2.5f);
-        dataSet.setValueTextSize(10f);
-        dataSet.setDrawValues(true);
-        dataSet.setValueTextColor(Color.BLACK);
-
-        // Customize line appearance - use LINEAR mode for actual data representation
-        dataSet.setMode(LineDataSet.Mode.LINEAR);
-
-        // Add highlighting for better user interaction
-        dataSet.setHighlightEnabled(true);
-        dataSet.setHighlightLineWidth(1f);
-        dataSet.setHighLightColor(Color.parseColor("#80CCCCCC")); // semi-transparent gray
-
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
-
-        // Configure X-axis with proper labels
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f); // Minimum axis step (interval) is 1
-        xAxis.setLabelRotationAngle(45f); // Rotate labels for better readability
-        xAxis.setDrawGridLines(false);
-
-        // Configure chart appearance
-        lineChart.getDescription().setEnabled(false);
-        lineChart.getLegend().setEnabled(true);
-        lineChart.setDrawGridBackground(false);
-        lineChart.getAxisRight().setEnabled(false); // Hide right Y-axis
-        lineChart.getAxisLeft().setDrawGridLines(true);
-
-        // Add animation
-        lineChart.animateXY(1000, 1000);
-
-        // Refresh chart
-        lineChart.invalidate();
     }
 }

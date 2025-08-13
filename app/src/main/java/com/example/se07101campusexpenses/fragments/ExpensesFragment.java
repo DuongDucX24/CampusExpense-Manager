@@ -16,13 +16,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.activities.AddExpenseActivity;
+import com.example.se07101campusexpenses.activities.AllExpensesActivity;
 import com.example.se07101campusexpenses.activities.EditExpenseActivity;
 import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
@@ -31,6 +29,7 @@ import com.example.se07101campusexpenses.model.Expense;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,13 +42,16 @@ public class ExpensesFragment extends Fragment {
     private ExpenseRepository expenseRepository;
     private ExpenseAdapter expenseAdapter;
     private LinearLayout emptyStateContainer;
-    private ConstraintLayout contentLayout;
+    private LinearLayout contentLayout;
+    private LinearLayout expensesContainer;
     private TextView tvTotalSpent, tvExpenseCount;
+    private TextView tvShowMoreExpenses;
     private EditText etSearchExpense;
     private List<Expense> allExpenses = new ArrayList<>();
     private List<Expense> filteredExpenses = new ArrayList<>();
     private int userId;
     private NumberFormat vndFormat;
+    private static final int MAX_ITEMS_TO_SHOW = 5;
 
     public ExpensesFragment() {
         // Required empty public constructor
@@ -74,115 +76,112 @@ public class ExpensesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         try {
-            // Find all UI components
-            RecyclerView recyclerViewExpenses = view.findViewById(R.id.recyclerViewExpenses);
+            // Find all UI components for new layout
             FloatingActionButton fabAddExpense = view.findViewById(R.id.fabAddExpense);
             emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
             contentLayout = view.findViewById(R.id.contentLayout);
+            expensesContainer = view.findViewById(R.id.expensesContainer);
             tvTotalSpent = view.findViewById(R.id.tvTotalSpent);
             tvExpenseCount = view.findViewById(R.id.tvExpenseCount);
             etSearchExpense = view.findViewById(R.id.etSearchExpense);
+            tvShowMoreExpenses = view.findViewById(R.id.tvShowMoreExpenses);
 
             userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
             expenseRepository = new ExpenseRepository(requireContext());
 
-            recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(getContext()));
-
-            // Create the adapter with empty constructor
+            // Create the adapter for reference (but won't use recyclerView anymore)
             expenseAdapter = new ExpenseAdapter();
-            recyclerViewExpenses.setAdapter(expenseAdapter);
 
-            // Setup item click listener
-            expenseAdapter.setOnItemClickListener(expense -> {
-                Intent intent = new Intent(getActivity(), EditExpenseActivity.class);
-                intent.putExtra("expense", expense);
+            // Set up "Show More" button
+            tvShowMoreExpenses.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), AllExpensesActivity.class);
                 startActivity(intent);
             });
 
-            // Setup FAB
+            // Set up search functionality
+            etSearchExpense.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    filterExpenses(s.toString());
+                }
+            });
+
+            // Setup FAB click listener
             fabAddExpense.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), AddExpenseActivity.class);
                 startActivity(intent);
             });
 
-            // Setup search functionality
-            if (etSearchExpense != null) {
-                etSearchExpense.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        filterExpenses(s.toString());
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {}
-                });
-            }
-
-            // Load data initially
+            // Load expenses initially
             loadExpenses();
+
         } catch (Exception e) {
-            Log.e(TAG, "Error in onViewCreated: " + e.getMessage(), e);
-            Toast.makeText(getContext(), "Error setting up Expenses view", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error setting up ExpensesFragment: " + e.getMessage(), e);
+            Toast.makeText(getContext(), "Error initializing expenses view", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadExpenses();  // Refresh data when returning to this fragment
+        loadExpenses(); // Refresh when returning to the fragment
     }
 
     private void loadExpenses() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             try {
-                allExpenses = expenseRepository.getExpensesByUserId(userId);
+                // Get current month's bounds
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-                if (allExpenses == null) {
-                    allExpenses = new ArrayList<>();
+                // Set to first day of month
+                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                String startDate = dateFormat.format(calendar.getTime());
+
+                // Set to last day of month
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                String endDate = dateFormat.format(calendar.getTime());
+
+                // Clear and load new data
+                allExpenses.clear();
+                filteredExpenses.clear();
+
+                List<Expense> expenses = expenseRepository.getExpensesBetweenDatesForUser(startDate, endDate, userId);
+                if (expenses != null) {
+                    allExpenses.addAll(expenses);
+                    filteredExpenses.addAll(expenses);
                 }
 
-                // Filter for the current month's summary
-                List<Expense> currentMonthExpenses = filterCurrentMonthExpenses(allExpenses);
-
-                // Calculate totals for current month
-                double totalMonthlySpent = 0;
-                for (Expense expense : currentMonthExpenses) {
-                    totalMonthlySpent += expense.getAmount();
+                // Calculate total amount
+                double totalAmount = 0;
+                for (Expense expense : allExpenses) {
+                    totalAmount += expense.getAmount();
                 }
 
-                // Apply current search filter
-                String currentSearchQuery = etSearchExpense != null ? etSearchExpense.getText().toString() : "";
+                final double finalTotalAmount = totalAmount;
+                final boolean isEmpty = allExpenses.isEmpty();
 
-                // Get a final reference for the lambda
-                final double finalTotalMonthlySpent = totalMonthlySpent;
-                final int currentExpenseCount = currentMonthExpenses.size();
-
-                // Filter expenses based on search
-                filterExpenses(currentSearchQuery);
-
-                // Make sure fragment is still attached before updating UI
-                if (isAdded() && getActivity() != null && !getActivity().isFinishing()) {
+                // Update UI on main thread if fragment is still attached
+                if (isAdded() && getActivity() != null) {
                     requireActivity().runOnUiThread(() -> {
                         try {
-                            // Update UI with the new data
-                            updateExpenseList();
+                            // Update expense display with limited items
+                            updateExpenseDisplay();
 
-                            // Update monthly summary
-                            if (tvTotalSpent != null) {
-                                tvTotalSpent.setText(vndFormat.format(finalTotalMonthlySpent));
-                            }
+                            // Update summary data
+                            tvTotalSpent.setText(vndFormat.format(finalTotalAmount));
+                            tvExpenseCount.setText(String.valueOf(allExpenses.size()));
 
-                            if (tvExpenseCount != null) {
-                                tvExpenseCount.setText(String.valueOf(currentExpenseCount));
-                            }
-
-                            // Show/hide empty state
-                            toggleEmptyState(filteredExpenses.isEmpty());
+                            // Toggle empty state visibility
+                            toggleEmptyState(isEmpty);
                         } catch (Exception e) {
-                            Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
+                            Log.e(TAG, "Error updating UI with expense data: " + e.getMessage(), e);
                         }
                     });
                 }
@@ -192,72 +191,66 @@ public class ExpensesFragment extends Fragment {
         });
     }
 
-    private List<Expense> filterCurrentMonthExpenses(List<Expense> expenses) {
-        if (expenses == null) return new ArrayList<>();
+    private void updateExpenseDisplay() {
+        if (!filteredExpenses.isEmpty()) {
+            // Clear container
+            expensesContainer.removeAllViews();
 
-        // Get current month and year
-        Calendar calendar = Calendar.getInstance();
-        int currentMonth = calendar.get(Calendar.MONTH) + 1; // Calendar months are 0-indexed
-        int currentYear = calendar.get(Calendar.YEAR);
+            // Show limited number of items
+            int itemsToShow = Math.min(filteredExpenses.size(), MAX_ITEMS_TO_SHOW);
 
-        List<Expense> filteredList = new ArrayList<>();
-
-        for (Expense expense : expenses) {
-            try {
-                String[] dateParts = expense.getDate().split("/");
-                if (dateParts.length == 3) {
-                    int month = Integer.parseInt(dateParts[1]);
-                    int year = Integer.parseInt(dateParts[2]);
-
-                    if (month == currentMonth && year == currentYear) {
-                        filteredList.add(expense);
-                    }
-                }
-            } catch (Exception e) {
-                // Skip expenses with invalid dates
-                Log.w(TAG, "Skipping expense with invalid date: " + expense.getDate());
+            // Add expense items to container
+            for (int i = 0; i < itemsToShow; i++) {
+                Expense expense = filteredExpenses.get(i);
+                View expenseItemView = createExpenseItemView(expense);
+                expensesContainer.addView(expenseItemView);
             }
-        }
 
-        return filteredList;
+            // Show/hide "Show More" button
+            tvShowMoreExpenses.setVisibility(filteredExpenses.size() > MAX_ITEMS_TO_SHOW ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private View createExpenseItemView(Expense expense) {
+        // Inflate a layout for individual expense items
+        View itemView = getLayoutInflater().inflate(R.layout.item_expense, null);
+
+        // Get references to views in the item layout
+        TextView tvTitle = itemView.findViewById(R.id.tvExpenseTitle);
+        TextView tvAmount = itemView.findViewById(R.id.tvExpenseAmount);
+        TextView tvCategory = itemView.findViewById(R.id.tvExpenseCategory);
+        TextView tvDate = itemView.findViewById(R.id.tvExpenseDate);
+
+        // Populate with expense data
+        tvTitle.setText(expense.getDescription());
+        tvAmount.setText(vndFormat.format(expense.getAmount()));
+        tvCategory.setText(expense.getCategory());
+        tvDate.setText(expense.getDate());
+
+        // Set click listener
+        itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), EditExpenseActivity.class);
+            intent.putExtra("expense", expense);
+            startActivity(intent);
+        });
+
+        return itemView;
     }
 
     private void filterExpenses(String query) {
-        if (allExpenses == null) return;
-
-        try {
-            if (query.isEmpty()) {
-                filteredExpenses = new ArrayList<>(allExpenses);
-            } else {
-                String lowerCaseQuery = query.toLowerCase();
-                filteredExpenses = allExpenses.stream()
-                    .filter(expense -> {
-                        String description = expense.getDescription();
-                        String category = expense.getCategory();
-                        return (description != null && description.toLowerCase().contains(lowerCaseQuery)) ||
-                               (category != null && category.toLowerCase().contains(lowerCaseQuery));
-                    })
+        if (query.isEmpty()) {
+            filteredExpenses.clear();
+            filteredExpenses.addAll(allExpenses);
+        } else {
+            String lowerCaseQuery = query.toLowerCase();
+            filteredExpenses = allExpenses.stream()
+                    .filter(expense ->
+                        expense.getDescription().toLowerCase().contains(lowerCaseQuery) ||
+                        expense.getCategory().toLowerCase().contains(lowerCaseQuery))
                     .collect(Collectors.toList());
-            }
-
-            if (isAdded()) {
-                updateExpenseList();
-                toggleEmptyState(filteredExpenses.isEmpty());
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error filtering expenses: " + e.getMessage(), e);
         }
-    }
-
-    private void updateExpenseList() {
-        try {
-            // First set to null to force a full refresh
-            expenseAdapter.submitList(null);
-            // Then submit the actual list
-            expenseAdapter.submitList(new ArrayList<>(filteredExpenses));
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating expense list: " + e.getMessage(), e);
-        }
+        updateExpenseDisplay();
+        toggleEmptyState(filteredExpenses.isEmpty());
     }
 
     private void toggleEmptyState(boolean isEmpty) {
