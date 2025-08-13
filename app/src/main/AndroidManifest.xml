@@ -29,7 +29,6 @@
         <activity android:name=".activities.ExpenseOverviewActivity"/>
         <service android:name=".service.RecurringExpenseService" />
         <service android:name=".service.NotificationService" />
-        <activity android:name=".activities.ExpenseReportActivity"/>
         <activity android:name=".activities.AddBudgetActivity"/>
         <activity android:name=".activities.EditBudgetActivity"/>
         <activity android:name=".activities.AddExpenseActivity"/>

@@ -1,12 +1,10 @@
 package com.example.se07101campusexpenses.activities;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +43,6 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
     private ProgressBar progressBudget;
     private PieChart pieChart;
     private RecyclerView rvCategoryBreakdown;
-    private Button btnViewDetailedReport;
 
     // Repositories
     private ExpenseRepository expenseRepository;
@@ -84,11 +81,6 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
 
         initializeViews();
 
-        btnViewDetailedReport.setOnClickListener(v -> {
-            Intent intent = new Intent(ExpenseOverviewActivity.this, ExpenseReportActivity.class);
-            startActivity(intent);
-        });
-
         loadExpenseData();
     }
 
@@ -111,7 +103,6 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         rvCategoryBreakdown = findViewById(R.id.rvCategoryBreakdown);
         rvCategoryBreakdown.setLayoutManager(new LinearLayoutManager(this));
         rvCategoryBreakdown.setNestedScrollingEnabled(false);
-        btnViewDetailedReport = findViewById(R.id.btnViewDetailedReport);
     }
 
     private void loadExpenseData() {

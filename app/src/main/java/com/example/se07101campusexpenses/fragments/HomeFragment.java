@@ -21,7 +21,6 @@ import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.activities.AddBudgetActivity;
 import com.example.se07101campusexpenses.activities.AddExpenseActivity;
 import com.example.se07101campusexpenses.activities.ExpenseOverviewActivity;
-import com.example.se07101campusexpenses.activities.ExpenseReportActivity;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
@@ -82,21 +81,10 @@ public class HomeFragment extends Fragment {
 
             // Set up report & analysis buttons
             Button btnExpenseOverview = view.findViewById(R.id.btnExpenseOverview);
-            Button btnExpenseReport = view.findViewById(R.id.btnExpenseReport);
 
             btnExpenseOverview.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), ExpenseOverviewActivity.class);
                 startActivity(intent);
-            });
-
-            btnExpenseReport.setOnClickListener(v -> {
-                try {
-                    Intent intent = new Intent(getActivity(), ExpenseReportActivity.class);
-                    startActivity(intent);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error launching expense report: " + e.getMessage(), e);
-                    Toast.makeText(getContext(), "Could not open report", Toast.LENGTH_SHORT).show();
-                }
             });
 
             // Get current user ID
