@@ -48,7 +48,7 @@ public class BudgetFragment extends Fragment {
     private LinearLayout budgetsContainer;
     private TextView tvShowMoreBudgets;
     private NumberFormat vndFormat;
-    private static final int MAX_ITEMS_TO_SHOW = 4;
+    private static final int MAX_ITEMS_TO_SHOW = 3;
 
     public BudgetFragment() {
         // Required empty public constructor
@@ -121,9 +121,9 @@ public class BudgetFragment extends Fragment {
 
                     List<Budget> userBudgets = budgetRepository.getBudgetsByUserId(userId);
 
-                    // Sum only monthly budgets for the monthly summary
-                    double totalMonthlyBudget = 0;
-                    double monthlyRemainingSum = 0;
+                    // Sum across all budgets (not only monthly) for the header totals
+                    double totalBudgetSum = 0;
+                    double totalAvailableSum = 0;
 
                     ExpenseDao expenseDao = AppDatabase.getInstance(requireContext()).expenseDao();
 
@@ -138,15 +138,14 @@ public class BudgetFragment extends Fragment {
                             double remaining = Math.max(0, budget.getAmount() - spentVal);
                             budgetRemainingMap.put(budget.getId(), remaining);
 
-                            if ("Monthly".equalsIgnoreCase(period)) {
-                                totalMonthlyBudget += budget.getAmount();
-                                monthlyRemainingSum += remaining;
-                            }
+                            // Include every budget in the header totals
+                            totalBudgetSum += budget.getAmount();
+                            totalAvailableSum += remaining;
                         }
                     }
 
-                    final double finalTotalBudget = totalMonthlyBudget;
-                    final double finalAvailable = Math.max(0, monthlyRemainingSum);
+                    final double finalTotalBudget = totalBudgetSum;
+                    final double finalAvailable = Math.max(0, totalAvailableSum);
                     final boolean isEmpty = budgetList.isEmpty();
 
                     if (isAdded() && getActivity() != null) {

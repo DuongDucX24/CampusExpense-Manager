@@ -1,5 +1,6 @@
 package com.example.se07101campusexpenses.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -81,4 +82,7 @@ public interface ExpenseDao {
 
     @Query("SELECT SUM(amount) FROM expenses WHERE budgetId = :budgetId AND id != :excludeExpenseId AND date BETWEEN :startDate AND :endDate")
     Double getTotalByBudgetBetweenDatesExcluding(int budgetId, int excludeExpenseId, String startDate, String endDate);
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE userId = :userId")
+    LiveData<Double> observeTotalExpensesByUserId(int userId);
 }

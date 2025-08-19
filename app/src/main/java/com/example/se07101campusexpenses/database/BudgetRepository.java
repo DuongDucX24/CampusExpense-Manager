@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses.database;
 
 import android.content.Context;
+import androidx.lifecycle.LiveData;
 
 import com.example.se07101campusexpenses.model.Budget;
 
@@ -55,6 +56,10 @@ public class BudgetRepository {
             e.printStackTrace();
             return 0.0;
         }
+    }
+
+    public LiveData<Double> observeTotalBudgetByUserId(int userId) {
+        return budgetDao.observeTotalBudgetByUserId(userId);
     }
 
     public List<Budget> getBudgetsByUserId(int userId) {

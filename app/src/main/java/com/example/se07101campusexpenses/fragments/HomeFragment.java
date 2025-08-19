@@ -39,6 +39,10 @@ public class HomeFragment extends Fragment {
     private int userId;
     private NumberFormat vndFormat;
 
+    // Keep the latest observed totals
+    private double currentTotalExpenses = 0.0;
+    private double currentTotalBudget = 0.0;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -65,27 +69,14 @@ public class HomeFragment extends Fragment {
             tvRemainingBudget = view.findViewById(R.id.tvRemainingBudget);
             progressBudget = view.findViewById(R.id.progressBudget);
 
-            // Set up quick action buttons using regular Button instead of MaterialButton
+            // Set up quick action buttons
             Button btnAddExpense = view.findViewById(R.id.btnAddExpense);
             Button btnAddBudget = view.findViewById(R.id.btnAddBudget);
-
-            btnAddExpense.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), AddExpenseActivity.class);
-                startActivity(intent);
-            });
-
-            btnAddBudget.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), AddBudgetActivity.class);
-                startActivity(intent);
-            });
-
-            // Set up report & analysis buttons
             Button btnExpenseOverview = view.findViewById(R.id.btnExpenseOverview);
 
-            btnExpenseOverview.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), ExpenseOverviewActivity.class);
-                startActivity(intent);
-            });
+            btnAddExpense.setOnClickListener(v -> startActivity(new Intent(getActivity(), AddExpenseActivity.class)));
+            btnAddBudget.setOnClickListener(v -> startActivity(new Intent(getActivity(), AddBudgetActivity.class)));
+            btnExpenseOverview.setOnClickListener(v -> startActivity(new Intent(getActivity(), ExpenseOverviewActivity.class)));
 
             // Get current user ID
             userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
@@ -94,7 +85,18 @@ public class HomeFragment extends Fragment {
             expenseRepository = new ExpenseRepository(requireContext());
             budgetRepository = new BudgetRepository(requireContext());
 
-            // Load financial data
+            // Observe totals reactively so the dashboard updates immediately on data changes
+            budgetRepository.observeTotalBudgetByUserId(userId).observe(getViewLifecycleOwner(), totalBudget -> {
+                currentTotalBudget = totalBudget != null ? totalBudget : 0.0;
+                updateSummaryUI();
+            });
+
+            expenseRepository.observeTotalExpensesByUserId(userId).observe(getViewLifecycleOwner(), totalExpenses -> {
+                currentTotalExpenses = totalExpenses != null ? totalExpenses : 0.0;
+                updateSummaryUI();
+            });
+
+            // Optional: initial one-shot load as a fallback (observers will quickly update)
             loadFinancialSummary();
 
         } catch (Exception e) {
@@ -106,7 +108,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadFinancialSummary(); // Refresh data when returning to the fragment
+        // Observers will refresh automatically; keep fallback to ensure UI isn't stale
+        loadFinancialSummary();
+    }
+
+    private void updateSummaryUI() {
+        double remainingBudget = currentTotalBudget - currentTotalExpenses;
+        int utilization = currentTotalBudget > 0 ? (int) Math.min(100, (currentTotalExpenses / currentTotalBudget) * 100) : 0;
+        tvTotalSpending.setText(vndFormat.format(currentTotalExpenses));
+        tvRemainingBudget.setText(vndFormat.format(remainingBudget));
+        progressBudget.setProgress(utilization);
     }
 
     private void loadFinancialSummary() {
@@ -114,28 +125,12 @@ public class HomeFragment extends Fragment {
             try {
                 double totalExpenses = expenseRepository.getTotalExpensesByUserId(userId);
                 double totalBudget = budgetRepository.getTotalBudgetByUserId(userId);
-                double remainingBudget = totalBudget - totalExpenses;
-                int budgetUtilizationPercentage = totalBudget > 0
-                    ? (int) ((totalExpenses / totalBudget) * 100)
-                    : 0;
 
-                // Ensure utilization percentage doesn't exceed 100%
-                budgetUtilizationPercentage = Math.min(budgetUtilizationPercentage, 100);
-
-                final double finalTotalExpenses = totalExpenses;
-                final double finalRemainingBudget = remainingBudget;
-                final int finalUtilizationPercentage = budgetUtilizationPercentage;
-
-                // Update UI on the main thread if fragment is still attached
                 if (isAdded() && getActivity() != null) {
                     requireActivity().runOnUiThread(() -> {
-                        try {
-                            tvTotalSpending.setText(vndFormat.format(finalTotalExpenses));
-                            tvRemainingBudget.setText(vndFormat.format(finalRemainingBudget));
-                            progressBudget.setProgress(finalUtilizationPercentage);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
-                        }
+                        currentTotalExpenses = totalExpenses;
+                        currentTotalBudget = totalBudget;
+                        updateSummaryUI();
                     });
                 }
             } catch (Exception e) {

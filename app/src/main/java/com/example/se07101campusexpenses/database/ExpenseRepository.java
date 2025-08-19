@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses.database;
 
 import android.content.Context;
+import androidx.lifecycle.LiveData;
 import com.example.se07101campusexpenses.model.Expense;
 import com.example.se07101campusexpenses.database.ExpenseDao;
 import com.example.se07101campusexpenses.model.CategorySum;
@@ -279,5 +280,9 @@ public class ExpenseRepository {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    public LiveData<Double> observeTotalExpensesByUserId(int userId) {
+        return expenseDao.observeTotalExpensesByUserId(userId);
     }
 }

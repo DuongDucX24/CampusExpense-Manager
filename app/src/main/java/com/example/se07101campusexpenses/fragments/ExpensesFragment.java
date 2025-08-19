@@ -51,7 +51,7 @@ public class ExpensesFragment extends Fragment {
     private List<Expense> filteredExpenses = new ArrayList<>();
     private int userId;
     private NumberFormat vndFormat;
-    private static final int MAX_ITEMS_TO_SHOW = 5;
+    private static final int MAX_ITEMS_TO_SHOW = 4;
 
     public ExpensesFragment() {
         // Required empty public constructor

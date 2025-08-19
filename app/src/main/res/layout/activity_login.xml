@@ -7,14 +7,6 @@
     android:layout_height="match_parent"
     android:padding="15dp"
     tools:ignore="HardcodedText">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BTEC - FPT"
-        android:textSize="20sp"
-        android:textColor="#E60E0E"
-        android:layout_gravity="center_horizontal"
-        tools:ignore="HardcodedText" />
     <ImageView
         android:layout_width="180dp"
         android:layout_height="150dp"
@@ -65,7 +57,7 @@
             android:layout_height="wrap_content"
             android:text="Login"
             android:layout_weight="1"
-            android:backgroundTint="#0E86E4"
+            android:backgroundTint="#F16824"
             android:layout_marginEnd="5dp"/>
 
         <Button
@@ -75,7 +67,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn_register"
             android:layout_weight="1"
-            android:backgroundTint="#0E86E4"
+            android:backgroundTint="#F16824"
             android:layout_marginStart="5dp"/>
     </LinearLayout>
 
