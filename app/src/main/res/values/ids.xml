@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ensure these IDs exist in R even if some layout variants are stale -->
+    <item name="spBudgetPeriod" type="id"/>
+    <item name="tvBudgetRemaining" type="id"/>
+</resources>
+

@@ -72,4 +72,13 @@ public interface ExpenseDao {
      */
     @Query("SELECT SUM(amount) FROM expenses WHERE date BETWEEN :startDate AND :endDate AND userId = :userId")
     Double getTotalExpensesBetweenDatesForUser(String startDate, String endDate, int userId);
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND category = :category AND date BETWEEN :startDate AND :endDate")
+    Double getTotalByCategoryBetweenDatesForUser(int userId, String category, String startDate, String endDate);
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE budgetId = :budgetId AND date BETWEEN :startDate AND :endDate")
+    Double getTotalByBudgetBetweenDates(int budgetId, String startDate, String endDate);
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE budgetId = :budgetId AND id != :excludeExpenseId AND date BETWEEN :startDate AND :endDate")
+    Double getTotalByBudgetBetweenDatesExcluding(int budgetId, int excludeExpenseId, String startDate, String endDate);
 }

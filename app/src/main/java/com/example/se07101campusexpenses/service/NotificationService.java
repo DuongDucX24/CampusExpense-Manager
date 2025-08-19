@@ -6,7 +6,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 
@@ -29,7 +28,7 @@ public class NotificationService extends Service {
     private int userId;
     private NumberFormat vndFormat; // Added for currency formatting
 
-    private Runnable runnable = new Runnable() {
+    private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             checkBudgetStatus();
@@ -68,16 +67,15 @@ public class NotificationService extends Service {
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Budget Notification Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(serviceChannel);
-            }
+        // minSdk is 29, so NotificationChannel APIs are always available
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Budget Notification Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.createNotificationChannel(serviceChannel);
         }
     }
 
@@ -89,7 +87,6 @@ public class NotificationService extends Service {
             if (budgets == null) return;
 
             List<Expense> allUserExpenses = appDatabase.expenseDao().getExpensesByUserId(userId);
-            // if (allUserExpenses == null) return; // Can proceed even if no expenses yet
 
             for (Budget budget : budgets) {
                 double totalExpensesForCategory = 0;

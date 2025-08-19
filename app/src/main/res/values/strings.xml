@@ -22,6 +22,59 @@
     <string name="create_budget_button_text">Create Budget</string>
     <string name="user_not_logged_in">User not logged in</string>
     <string name="error_loading_data">Error loading data</string>
+    <string name="error_loading_budgets">Failed to load budgets</string>
     <string name="total_spending">Total Spending: %s</string>
+    <string name="total_budget">Total Budget: %s</string>
     <string name="remaining_budget">Remaining Budget: %s</string>
+    <!-- Titles for screens -->
+    <string name="title_create_budget">Create Budget</string>
+    <string name="title_edit_budget">Edit Budget</string>
+    <string name="title_all_budgets">All Budgets</string>
+    <string name="title_all_expenses">All Expenses</string>
+    <string name="title_expense_overview">Expense Overview</string>
+    <!-- Chart and labels -->
+    <string name="categories">Categories</string>
+    <string name="expenses_by_category">Expenses by Category</string>
+
+    <!-- Periods for Budget Spinner -->
+    <string-array name="budget_periods">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
+
+    <!-- Auth common -->
+    <string name="label_username">Username</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="label_security_question">Security Question:</string>
+    <string name="hint_security_answer">Answer to security question</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_back_to_login">Back to Login</string>
+    <string name="forgot_password">Forgot Password?</string>
+
+    <!-- Register screen text -->
+    <string name="title_create_account">Create Account</string>
+    <string name="username_requirement">• Username must be at least 3 characters long</string>
+    <string name="email_requirement">• Email must be in a valid format (e.g., user@example.com)</string>
+    <string name="password_requirements_title">Password Requirements:</string>
+    <string name="password_requirements_register">• At least 6 characters long
+• Contains at least one special character
+• Passwords must match</string>
+    <string name="security_answer_requirement">• Security answer is case-sensitive and required for password recovery</string>
+
+    <!-- Forgot password -->
+    <string name="title_password_recovery">Password Recovery</string>
+    <string name="recovery_instructions">Enter your email to begin recovery</string>
+    <string name="btn_find_account">Find My Account</string>
+    <string name="hint_your_answer">Your answer</string>
+    <string name="btn_verify_answer">Verify Answer</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="password_requirements_reset">• At least 6 characters long
+• Contains at least one special character</string>
+    <string name="btn_reset_password">Reset Password</string>
+    <string name="hint_username_or_email">Username or Email</string>
+    <string name="btn_login">Login</string>
 </resources>

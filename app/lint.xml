@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Suppress non-functional suggestions and noisy checks to keep CI clean -->
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="OldTargetApi" severity="ignore" />
+
+    <!-- Resource-related noise -->
+    <issue id="Overdraw" severity="ignore" />
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="IconLocation" severity="ignore" />
+    <issue id="VectorPath" severity="ignore" />
+
+    <!-- This resource folder version warning is safe for minSdk 29+ -->
+    <issue id="ObsoleteSdkInt" severity="ignore" />
+</lint>
+

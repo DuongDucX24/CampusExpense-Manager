@@ -18,7 +18,7 @@ import com.example.se07101campusexpenses.database.RecurringExpenseDao;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Expense.class, Budget.class, RecurringExpense.class}, version = 2, exportSchema = false)
+@Database(entities = {User.class, Expense.class, Budget.class, RecurringExpense.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract ExpenseDao expenseDao();

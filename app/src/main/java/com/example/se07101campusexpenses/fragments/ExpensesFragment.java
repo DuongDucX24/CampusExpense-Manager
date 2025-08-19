@@ -212,8 +212,8 @@ public class ExpensesFragment extends Fragment {
     }
 
     private View createExpenseItemView(Expense expense) {
-        // Inflate a layout for individual expense items
-        View itemView = getLayoutInflater().inflate(R.layout.item_expense, null);
+        // Inflate a layout for individual expense items with the proper parent
+        View itemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_expense, expensesContainer, false);
 
         // Get references to views in the item layout
         TextView tvTitle = itemView.findViewById(R.id.tvExpenseTitle);
@@ -242,11 +242,11 @@ public class ExpensesFragment extends Fragment {
             filteredExpenses.clear();
             filteredExpenses.addAll(allExpenses);
         } else {
-            String lowerCaseQuery = query.toLowerCase();
+            String lowerCaseQuery = query.toLowerCase(Locale.ROOT);
             filteredExpenses = allExpenses.stream()
                     .filter(expense ->
-                        expense.getDescription().toLowerCase().contains(lowerCaseQuery) ||
-                        expense.getCategory().toLowerCase().contains(lowerCaseQuery))
+                        expense.getDescription().toLowerCase(Locale.ROOT).contains(lowerCaseQuery) ||
+                        expense.getCategory().toLowerCase(Locale.ROOT).contains(lowerCaseQuery))
                     .collect(Collectors.toList());
         }
         updateExpenseDisplay();

@@ -42,7 +42,7 @@ public class AllExpensesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("All Expenses");
+            getSupportActionBar().setTitle(getString(R.string.title_all_expenses));
         }
 
         // Get user ID
@@ -93,7 +93,7 @@ public class AllExpensesActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, "Error loading expenses: " + e.getMessage(), e);
                 runOnUiThread(() -> {
-                    Toast.makeText(AllExpensesActivity.this, "Failed to load expenses", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AllExpensesActivity.this, getString(R.string.error_loading_data), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -102,7 +102,8 @@ public class AllExpensesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            // Use OnBackPressedDispatcher to avoid deprecation
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

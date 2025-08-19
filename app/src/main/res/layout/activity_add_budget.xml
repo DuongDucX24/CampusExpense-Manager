@@ -8,6 +8,7 @@
     android:background="@color/colorBackground"
     tools:ignore="HardcodedText,VisualLintButtonSize">
     <TextView
+        android:id="@+id/tvBudgetTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Budget"
@@ -38,15 +39,23 @@
         android:inputType="numberDecimal"
         android:minHeight="48dp"
         tools:ignore="VisualLintTextFieldSize" />
-    <EditText
-        android:id="@+id/edtBudgetPeriod"
+
+    <!-- Replaced period EditText with Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Period"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/textColorPrimary"
+        tools:ignore="HardcodedText"/>
+
+    <Spinner
+        android:id="@+id/spBudgetPeriod"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="false"
-        android:hint="Enter budget period (e.g., Monthly)"
-        android:inputType="textMultiLine"
-        android:minHeight="48dp"
-        tools:ignore="VisualLintTextFieldSize" />
+        android:entries="@array/budget_periods"
+        android:minHeight="48dp" />
+
     <EditText
         android:id="@+id/edtBudgetDescription"
         android:layout_width="match_parent"
@@ -67,16 +76,7 @@
         android:id="@+id/btnSaveBudget"
         android:minHeight="48dp"
         tools:ignore="VisualLintButtonSize" />
-    <Button
-        android:id="@+id/btnDeleteBudget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:background="@color/colorDelete"
-        android:textColor="@color/colorTextWhite"
-        android:text="Delete"
-        android:minHeight="48dp"
-        tools:ignore="HardcodedText,VisualLintButtonSize" />
+    <!-- Removed Delete button to avoid showing it in Create and Edit screens -->
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

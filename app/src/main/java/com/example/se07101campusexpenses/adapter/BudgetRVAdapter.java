@@ -7,12 +7,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.model.Budget;
 
 import java.text.NumberFormat; // Added import
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,7 +33,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
     }
 
     public BudgetRVAdapter(List<Budget> model, Context context) {
-        this.budgetModels = model;
+        this.budgetModels = model != null ? new ArrayList<>(model) : new ArrayList<>();
         this.context = context;
         this.vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN")); // Initialize formatter
         this.vndFormat.setMaximumFractionDigits(0); // VND usually doesn't show decimals
@@ -63,10 +65,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
 
     @Override
     public int getItemCount() {
-        if (budgetModels != null) {
-            return budgetModels.size();
-        }
-        return 0;
+        return budgetModels != null ? budgetModels.size() : 0;
     }
 
     public class BudgetItemViewHolder extends RecyclerView.ViewHolder {
@@ -83,8 +82,32 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
         }
     }
 
-    public void setBudgets(List<Budget> budgets) {
-        this.budgetModels = budgets;
-        notifyDataSetChanged(); // Consider using DiffUtil for better performance
+    public void setBudgets(List<Budget> newBudgets) {
+        List<Budget> oldList = this.budgetModels != null ? this.budgetModels : new ArrayList<>();
+        List<Budget> newList = newBudgets != null ? new ArrayList<>(newBudgets) : new ArrayList<>();
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() { return oldList.size(); }
+            @Override
+            public int getNewListSize() { return newList.size(); }
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                Budget o = oldList.get(oldItemPosition);
+                Budget n = newList.get(newItemPosition);
+                return o.getId() == n.getId();
+            }
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                Budget o = oldList.get(oldItemPosition);
+                Budget n = newList.get(newItemPosition);
+                return o.getAmount() == n.getAmount()
+                        && equalsStr(o.getName(), n.getName())
+                        && equalsStr(o.getPeriod(), n.getPeriod())
+                        && equalsStr(o.getDescription(), n.getDescription());
+            }
+            private boolean equalsStr(String a, String b) { return a == null ? b == null : a.equals(b); }
+        });
+        this.budgetModels = newList;
+        diff.dispatchUpdatesTo(this);
     }
 }

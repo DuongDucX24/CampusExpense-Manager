@@ -41,7 +41,8 @@ public class AllBudgetsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("All Budgets");
+            // Use string resource for title
+            getSupportActionBar().setTitle(getString(R.string.title_all_budgets));
         }
 
         // Get user ID
@@ -76,7 +77,8 @@ public class AllBudgetsActivity extends AppCompatActivity {
                     allBudgets.addAll(budgets);
 
                     runOnUiThread(() -> {
-                        budgetAdapter.notifyDataSetChanged();
+                        // Use DiffUtil-based update
+                        budgetAdapter.setBudgets(allBudgets);
 
                         // Show/hide empty message
                         View emptyView = findViewById(R.id.emptyBudgetsMessage);
@@ -88,7 +90,7 @@ public class AllBudgetsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, "Error loading budgets: " + e.getMessage(), e);
                 runOnUiThread(() -> {
-                    Toast.makeText(AllBudgetsActivity.this, "Failed to load budgets", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AllBudgetsActivity.this, getString(R.string.error_loading_budgets), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -103,7 +105,8 @@ public class AllBudgetsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            // Use OnBackPressedDispatcher to avoid deprecation
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

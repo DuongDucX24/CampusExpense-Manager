@@ -92,45 +92,26 @@
                     android:backgroundTint="@color/colorButton"
                     android:textColor="@color/colorButtonText"/>
 
-                <LinearLayout
+                <!-- Replaced row with compound drawable TextView -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical">
+                    android:drawableStart="@android:drawable/ic_menu_call"
+                    android:drawablePadding="8dp"
+                    android:text="Support Phone: 0399638526"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_call" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Support Phone: 0399638526"
-                        android:textSize="14sp"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-
-                <LinearLayout
+                <!-- Replaced row with compound drawable TextView -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginTop="8dp"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_dialog_email" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Support Email: duygraphics@gmail.com"
-                        android:textSize="14sp"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
+                    android:drawableStart="@android:drawable/ic_dialog_email"
+                    android:drawablePadding="8dp"
+                    android:text="Support Email: duygraphics@gmail.com"
+                    android:textSize="14sp"
+                    android:gravity="center_vertical"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

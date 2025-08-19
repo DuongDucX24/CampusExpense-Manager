@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Account"
+        android:text="@string/title_create_account"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -18,7 +19,8 @@
         android:id="@+id/edtRegisterUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
+        android:hint="@string/label_username"
+        android:autofillHints="username"
         android:inputType="text"
         android:minHeight="48dp"
         android:layout_marginBottom="10dp"/>
@@ -27,7 +29,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="• Username must be at least 3 characters long"
+        android:text="@string/username_requirement"
         android:textSize="12sp"
         android:textColor="#555555"
         android:layout_marginBottom="10dp"/>
@@ -36,7 +38,8 @@
         android:id="@+id/edtEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
+        android:hint="@string/label_email"
+        android:autofillHints="emailAddress"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
         android:layout_marginBottom="10dp"/>
@@ -45,34 +48,46 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="• Email must be in a valid format (e.g., user@example.com)"
+        android:text="@string/email_requirement"
         android:textSize="12sp"
         android:textColor="#555555"
         android:layout_marginBottom="10dp"/>
 
-    <EditText
-        android:id="@+id/edtRegisterPassword"
+    <!-- Password with visibility toggle -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:layout_marginBottom="10dp"/>
+        app:endIconMode="password_toggle">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtRegisterPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_password"
+            android:autofillHints="password"
+            android:inputType="textPassword"
+            android:minHeight="48dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/edtConfirmPassword"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Confirm Password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginTop="10dp"
+        app:endIconMode="password_toggle">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_confirm_password"
+            android:autofillHints="password"
+            android:inputType="textPassword"
+            android:minHeight="48dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Password requirements -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Password Requirements:"
+        android:text="@string/password_requirements_title"
         android:textStyle="bold"
         android:textSize="14sp"
         android:layout_marginBottom="5dp"/>
@@ -80,7 +95,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="• At least 6 characters long\n• Contains at least one special character\n• Passwords must match"
+        android:text="@string/password_requirements_register"
         android:textSize="12sp"
         android:textColor="#555555"
         android:layout_marginBottom="16dp"/>
@@ -89,7 +104,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Security Question:"
+        android:text="@string/label_security_question"
         android:textStyle="bold"
         android:textSize="14sp"
         android:layout_marginBottom="5dp"/>
@@ -105,7 +120,8 @@
         android:id="@+id/edtSecurityAnswer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Answer to security question"
+        android:hint="@string/hint_security_answer"
+        android:autofillHints="name"
         android:inputType="text"
         android:minHeight="48dp"
         android:layout_marginBottom="16dp"/>
@@ -114,7 +130,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="• Security answer is case-sensitive and required for password recovery"
+        android:text="@string/security_answer_requirement"
         android:textSize="12sp"
         android:textColor="#555555"
         android:layout_marginBottom="16dp"/>
@@ -123,13 +139,13 @@
         android:id="@+id/btnPerformRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"/>
+        android:text="@string/btn_register"/>
 
     <Button
         android:id="@+id/btnBackToLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Back to Login"
+        android:text="@string/btn_back_to_login"
         android:layout_marginTop="10dp"/>
 
 </LinearLayout>

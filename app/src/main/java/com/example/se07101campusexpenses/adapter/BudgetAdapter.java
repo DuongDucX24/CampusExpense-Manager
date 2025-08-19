@@ -12,6 +12,7 @@ import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.model.Budget; // Corrected import
 
 import java.util.List;
+import java.util.Locale; // Added import
 
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder> {
 
@@ -42,7 +43,7 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
     public void onBindViewHolder(@NonNull BudgetViewHolder holder, int position) {
         Budget currentBudget = budgetList.get(position); // Changed type to Budget
         holder.tvBudgetName.setText(currentBudget.getName());
-        holder.tvBudgetAmount.setText(String.format("Amount: $%.2f", currentBudget.getAmount()));
+        holder.tvBudgetAmount.setText(String.format(Locale.getDefault(), "Amount: $%.2f", currentBudget.getAmount()));
         holder.tvBudgetPeriod.setText(currentBudget.getPeriod());
 
         holder.itemView.setOnClickListener(v -> {

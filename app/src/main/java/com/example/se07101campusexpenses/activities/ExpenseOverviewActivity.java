@@ -63,7 +63,7 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Expense Overview");
+            actionBar.setTitle(getString(R.string.title_expense_overview));
         }
 
         vndFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
@@ -74,7 +74,7 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
 
         userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
         if (userId == -1) {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.user_not_logged_in), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -87,7 +87,8 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            // Use OnBackPressedDispatcher to avoid deprecation
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -120,15 +121,15 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Error loading expense data: " + e.getMessage(), e);
-                runOnUiThread(() -> Toast.makeText(ExpenseOverviewActivity.this, "Error loading data", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(ExpenseOverviewActivity.this, getString(R.string.error_loading_data), Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void updateSummary(double totalSpending, double totalBudget, double remainingBudget) {
-        tvTotalSpending.setText("Total Spending: " + vndFormat.format(totalSpending));
-        tvTotalBudget.setText("Total Budget: " + vndFormat.format(totalBudget));
-        tvRemainingBudget.setText("Remaining Budget: " + vndFormat.format(remainingBudget));
+        tvTotalSpending.setText(getString(R.string.total_spending, vndFormat.format(totalSpending)));
+        tvTotalBudget.setText(getString(R.string.total_budget, vndFormat.format(totalBudget)));
+        tvRemainingBudget.setText(getString(R.string.remaining_budget, vndFormat.format(remainingBudget)));
 
         if (totalBudget > 0) {
             int progress = (int) ((totalSpending / totalBudget) * 100);
@@ -170,7 +171,7 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
             return;
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Categories");
+        PieDataSet dataSet = new PieDataSet(entries, getString(R.string.categories));
         dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setValueTextSize(12f);
@@ -178,7 +179,7 @@ public class ExpenseOverviewActivity extends AppCompatActivity {
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
         pieChart.getDescription().setEnabled(false);
-        pieChart.setCenterText("Expenses by Category");
+        pieChart.setCenterText(getString(R.string.expenses_by_category));
         pieChart.setDrawEntryLabels(false);
         pieChart.invalidate();
     }

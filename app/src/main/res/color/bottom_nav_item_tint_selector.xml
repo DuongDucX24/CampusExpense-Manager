@@ -1,26 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/colorPrimary" android:state_checked="true" />
-    <item android:color="?attr/colorOnSurfaceVariant" />
-
-    <!-- Your existing colors -->
-    <color android:name="purple_200" tools:ignore="ExtraText">#FFBB86FC</color>
-    <color android:name="purple_500">#FF6200EE</color>
-    <color android:name="purple_700">#FF3700B3</color>
-    <color android:name="teal_200">#FF03DAC5</color>
-    <color android:name="teal_700">#FF018786</color>
-    <color android:name="black">#FF000000</color>
-    <color android:name="white">#FFFFFFFF</color>
-
-    <!-- Add your missing colors here -->
-    <color android:name="colorBackground">#FFFFFF</color> <!-- Example: White -->
-    <color android:name="textColorPrimary">#000000</color> <!-- Example: Black -->
-    <color android:name="colorButton">#FF6200EE</color> <!-- Example: Purple 500 -->
-    <color android:name="colorButtonText">#FFFFFF</color>
-    <color android:name="colorTextWhite">#FFFFFF</color> <!-- Assuming this was from your original file for btnDeleteBudget -->
-
-
-    <!-- Add the missing colorDelete here -->
-    <color android:name="colorDelete">#D32F2F</color>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected item color -->
+    <item android:state_checked="true" android:color="@color/md_theme_primary" />
+    <!-- Default/unselected item color -->
+    <item android:color="@color/md_theme_onSurfaceVariant" />
 </selector>
-

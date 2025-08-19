@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.se07101campusexpenses.activities.MenuActivity;
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.UserRepository;
@@ -66,20 +65,9 @@ public class LoginActivity extends AppCompatActivity {
         // Change hint to indicate that email can be used too
         edtUsernameOrEmail.setHint("Username or Email");
 
-        // Check if there are any users in the database
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            int userCount = userRepository.getUserCount();
-            runOnUiThread(() -> {
-                if (userCount == 0) {
-                    // Disable forgot password if no users exist
-                    tvForgotPassword.setEnabled(false);
-                    tvForgotPassword.setAlpha(0.5f); // Visual indication that it's disabled
-                } else {
-                    tvForgotPassword.setEnabled(true);
-                    tvForgotPassword.setAlpha(1.0f);
-                }
-            });
-        });
+        // Keep "Forgot Password" always enabled and clickable
+        tvForgotPassword.setEnabled(true);
+        tvForgotPassword.setAlpha(1.0f);
 
         btnRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -106,26 +94,17 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // Determine if input is email or username
             boolean isEmail = Patterns.EMAIL_ADDRESS.matcher(usernameOrEmail).matches();
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
-                User user = null;
                 try {
-                    if (isEmail) {
-                        // Try to get user by email
-                        user = userRepository.getUserByEmail(usernameOrEmail);
-                    } else {
-                        // Try to get user by username
-                        user = userRepository.getUserByUsername(usernameOrEmail);
-                    }
+                    final User finalUser = isEmail
+                            ? userRepository.getUserByEmail(usernameOrEmail)
+                            : userRepository.getUserByUsername(usernameOrEmail);
 
-                    // Verify password if user exists
-                    final User finalUser = user;
                     runOnUiThread(() -> {
                         try {
                             if (finalUser != null && PasswordUtils.verifyPassword(password, finalUser.getPassword())) {
-                                // Save user ID to SharedPreferences
                                 SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putInt(KEY_USER_ID, finalUser.id);
@@ -145,9 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                     });
                 } catch (Exception e) {
                     Log.e("LoginActivity", "Error during login process", e);
-                    runOnUiThread(() -> {
-                        Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show();
-                    });
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "An error occurred during login.", Toast.LENGTH_SHORT).show());
                 }
             });
         });

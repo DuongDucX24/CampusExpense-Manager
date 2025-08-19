@@ -17,6 +17,7 @@ public class Expense implements Serializable {
     public boolean recurring;
     public String recurringStartDate;
     public String recurringEndDate;
+    public Integer budgetId; // link to a single budget
 
     public int getId() {
         return id;
@@ -88,5 +89,13 @@ public class Expense implements Serializable {
 
     public void setRecurringEndDate(String recurringEndDate) {
         this.recurringEndDate = recurringEndDate;
+    }
+
+    public Integer getBudgetId() {
+        return budgetId;
+    }
+
+    public void setBudgetId(Integer budgetId) {
+        this.budgetId = budgetId;
     }
 }

@@ -1,9 +1,11 @@
 package com.example.se07101campusexpenses.activities;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -13,23 +15,30 @@ import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetDao;
 import com.example.se07101campusexpenses.model.Budget;
+import com.example.se07101campusexpenses.util.FormatUtils;
 
 public class AddBudgetActivity extends AppCompatActivity {
-    private EditText edtBudgetName, edtBudgetAmount, edtBudgetDescription, edtBudgetPeriod; // Added edtBudgetDescription and edtBudgetPeriod
+    private EditText edtBudgetName, edtBudgetAmount, edtBudgetDescription;
+    private Spinner spBudgetPeriod; // Spinner for period
     private BudgetDao budgetDao;
     private int userId;
 
     @Override
+    @SuppressLint("MissingInflatedId")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_budget);
 
         edtBudgetName = findViewById(R.id.edtBudgetName);
-        edtBudgetAmount = findViewById(R.id.edtBudgetMoney); // Assuming edtBudgetMoney is for amount
-        edtBudgetDescription = findViewById(R.id.edtBudgetDescription); // Initialize edtBudgetDescription
-        edtBudgetPeriod = findViewById(R.id.edtBudgetPeriod); // Initialize edtBudgetPeriod
+        edtBudgetAmount = findViewById(R.id.edtBudgetMoney);
+        edtBudgetDescription = findViewById(R.id.edtBudgetDescription);
+        // Directly reference spinner id to avoid reflection
+        spBudgetPeriod = findViewById(R.id.spBudgetPeriod);
         Button btnSaveBudget = findViewById(R.id.btnSaveBudget);
         Button btnBackBudget = findViewById(R.id.btnBackBudget);
+
+        // Apply dot grouping formatter to amount field
+        FormatUtils.applyDotGroupingFormatter(edtBudgetAmount);
 
         budgetDao = AppDatabase.getInstance(this).budgetDao();
         userId = getSharedPreferences("user_prefs", MODE_PRIVATE).getInt("user_id", -1);
@@ -38,7 +47,9 @@ public class AddBudgetActivity extends AppCompatActivity {
             String nameBudget = edtBudgetName.getText().toString().trim();
             String amountBudgetStr = edtBudgetAmount.getText().toString().trim();
             String descriptionBudget = edtBudgetDescription.getText().toString().trim();
-            String periodBudget = edtBudgetPeriod.getText().toString().trim();
+            String periodBudget = (spBudgetPeriod != null && spBudgetPeriod.getSelectedItem() != null)
+                    ? spBudgetPeriod.getSelectedItem().toString()
+                    : "Monthly"; // default fallback
 
             if (TextUtils.isEmpty(nameBudget) || TextUtils.isEmpty(amountBudgetStr) || TextUtils.isEmpty(periodBudget) || TextUtils.isEmpty(descriptionBudget)) {
                 Toast.makeText(this, "Please enter all values", Toast.LENGTH_SHORT).show();
@@ -49,9 +60,11 @@ public class AddBudgetActivity extends AppCompatActivity {
                 return;
             }
 
+            // Strip grouping before parse
+            String plain = FormatUtils.stripGrouping(amountBudgetStr);
             double amountBudget;
             try {
-                amountBudget = Double.parseDouble(amountBudgetStr);
+                amountBudget = Double.parseDouble(plain);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Invalid amount format", Toast.LENGTH_SHORT).show();
                 return;
