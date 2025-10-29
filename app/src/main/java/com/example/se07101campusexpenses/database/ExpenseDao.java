@@ -85,4 +85,8 @@ public interface ExpenseDao {
 
     @Query("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE userId = :userId")
     LiveData<Double> observeTotalExpensesByUserId(int userId);
+
+    // New helper for deletion constraints
+    @Query("SELECT COUNT(*) FROM expenses WHERE budgetId = :budgetId")
+    int countByBudgetId(int budgetId);
 }

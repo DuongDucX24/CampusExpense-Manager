@@ -7,18 +7,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.View; // Added for visibility control
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog; // Added for confirmation dialog
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetDao;
-import com.example.se07101campusexpenses.database.ExpenseDao;
+import com.example.se07101campusexpenses.database.ExpenseDao; // Added for deletion constraint
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.util.FormatUtils;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -49,6 +50,7 @@ public class EditBudgetActivity extends AppCompatActivity {
 
         Button btnSaveBudget = findViewById(R.id.btnSaveBudget);
         Button btnBackBudget = findViewById(R.id.btnBackBudget);
+        Button btnDeleteBudget = findViewById(R.id.btnDeleteBudget); // Newly added delete button
 
         // Apply dot-grouping formatter to amount field
         FormatUtils.applyDotGroupingFormatter(edtBudgetAmount);
@@ -70,6 +72,8 @@ public class EditBudgetActivity extends AppCompatActivity {
                     }
                 }
             }
+            // Show delete button only in edit mode
+            if (btnDeleteBudget != null) btnDeleteBudget.setVisibility(View.VISIBLE);
         } else {
             Toast.makeText(this, "Error loading budget data.", Toast.LENGTH_SHORT).show();
             finish();
@@ -123,6 +127,36 @@ public class EditBudgetActivity extends AppCompatActivity {
                 });
             });
         });
+
+        // Deletion logic with constraint: disallow if any expenses are linked (across any dates)
+        if (btnDeleteBudget != null) {
+            btnDeleteBudget.setOnClickListener(v -> {
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    ExpenseDao expenseDao = AppDatabase.getInstance(getApplicationContext()).expenseDao();
+                    int linkedCount = expenseDao.countByBudgetId(budget.getId());
+                    if (linkedCount > 0) {
+                        runOnUiThread(() -> Toast.makeText(EditBudgetActivity.this,
+                                "Cannot delete. This budget is linked to " + linkedCount + " expense(s).",
+                                Toast.LENGTH_LONG).show());
+                    } else {
+                        runOnUiThread(() -> new AlertDialog.Builder(EditBudgetActivity.this)
+                                .setTitle("Delete Budget")
+                                .setMessage("Are you sure you want to delete this budget?")
+                                .setPositiveButton("Delete", (d, which) -> {
+                                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                                        budgetDao.delete(budget);
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(EditBudgetActivity.this, "Budget deleted", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        });
+                                    });
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show());
+                    }
+                });
+            });
+        }
 
         btnBackBudget.setOnClickListener(v -> finish());
     }
