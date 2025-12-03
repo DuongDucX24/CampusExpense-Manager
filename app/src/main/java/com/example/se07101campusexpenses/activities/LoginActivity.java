@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onAuthenticationSucceeded(
-                    BiometricPrompt.AuthenticationResult result) {
+                    @NonNull BiometricPrompt.AuthenticationResult result) {
                 String usernameOrEmail = edtUsernameOrEmail.getText().toString().trim();
                 boolean isEmail = Patterns.EMAIL_ADDRESS.matcher(usernameOrEmail).matches();
 
