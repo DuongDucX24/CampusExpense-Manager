@@ -71,16 +71,26 @@
             android:layout_marginStart="5dp"/>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btnBiometricLogin"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login with Biometrics"
+        android:backgroundTint="#F16824"
+        android:layout_marginTop="10dp"/>
+
     <!-- Forgot Password Button (always enabled/visible) -->
     <TextView
         android:id="@+id/tvForgotPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/forgot_password"
-        android:textColor="#0E86E4"
         android:layout_gravity="center_horizontal"
-        android:padding="10dp"
         android:layout_marginTop="10dp"
         android:clickable="true"
-        android:focusable="true" />
+        android:focusable="true"
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:text="@string/forgot_password"
+        android:textColor="#0E86E4" />
 </LinearLayout>

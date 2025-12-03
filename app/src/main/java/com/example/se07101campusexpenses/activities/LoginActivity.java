@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
@@ -22,6 +24,7 @@ import com.example.se07101campusexpenses.security.PasswordUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.concurrent.Executor;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edtUsernameOrEmail, edtPassword; // Changed from edtUsername to edtUsernameOrEmail
@@ -34,6 +37,10 @@ public class LoginActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "user_prefs";
     private static final String KEY_USER_ID = "user_id";
     private static final int DEFAULT_USER_ID = -1; // Indicates no user logged in
+
+    private Executor executor;
+    private BiometricPrompt biometricPrompt;
+    private BiometricPrompt.PromptInfo promptInfo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,6 +85,54 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
+        });
+
+        executor = ContextCompat.getMainExecutor(this);
+        biometricPrompt = new BiometricPrompt(LoginActivity.this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode,
+                                              CharSequence errString) {
+                Toast.makeText(getApplicationContext(),
+                        "Authentication error: " + errString, Toast.LENGTH_SHORT)
+                        .show();
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(
+                    BiometricPrompt.AuthenticationResult result) {
+                // Assuming you have a way to get the user's details after successful biometric auth
+                // For now, let's just log in the last logged-in user if available
+                SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                int userId = sharedPreferences.getInt(KEY_USER_ID, DEFAULT_USER_ID);
+                if (userId != DEFAULT_USER_ID) {
+                    Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "No user found for biometric login. Please log in manually first.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                Toast.makeText(getApplicationContext(), "Authentication failed",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for your app")
+                .setSubtitle("Log in using your biometric credential")
+                .setNegativeButtonText("Use account password")
+                .build();
+
+        // Add a button for biometric login and set its click listener
+        Button btnBiometricLogin = findViewById(R.id.btnBiometricLogin);
+        btnBiometricLogin.setOnClickListener(view -> {
+            biometricPrompt.authenticate(promptInfo);
         });
     }
 
