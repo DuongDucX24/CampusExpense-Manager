@@ -21,6 +21,10 @@
                 android:icon="@drawable/ic_profile"
                 android:title="My Profile" />
             <item
+                android:id="@+id/menu_import"
+                android:icon="@android:drawable/ic_menu_upload"
+                android:title="Import" />
+            <item
                 android:id="@+id/menu_logout"
                 android:icon="@drawable/ic_logout_modern"
                 android:title="Logout" />

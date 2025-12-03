@@ -89,4 +89,7 @@ public interface ExpenseDao {
     // New helper for deletion constraints
     @Query("SELECT COUNT(*) FROM expenses WHERE budgetId = :budgetId")
     int countByBudgetId(int budgetId);
+
+    @Query("DELETE FROM expenses WHERE userId = :userId")
+    void deleteByUserId(int userId);
 }

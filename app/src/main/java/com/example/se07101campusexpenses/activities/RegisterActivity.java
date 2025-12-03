@@ -82,6 +82,11 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            Toast.makeText(this, "Username can only contain letters and numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Validate email format
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();

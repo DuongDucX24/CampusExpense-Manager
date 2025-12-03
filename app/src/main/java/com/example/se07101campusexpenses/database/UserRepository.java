@@ -110,4 +110,12 @@ public class UserRepository {
             return 0;
         }
     }
+
+    public void deleteUserAccount(final int userId) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            budgetDao.deleteByUserId(userId);
+            expenseDao.deleteByUserId(userId);
+            userDao.delete(userId);
+        });
+    }
 }
