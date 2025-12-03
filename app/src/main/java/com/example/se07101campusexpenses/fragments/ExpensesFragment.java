@@ -47,7 +47,7 @@ public class ExpensesFragment extends Fragment {
     private TextView tvTotalSpent, tvExpenseCount;
     private TextView tvShowMoreExpenses;
     private EditText etSearchExpense;
-    private List<Expense> allExpenses = new ArrayList<>();
+    private final List<Expense> allExpenses = new ArrayList<>();
     private List<Expense> filteredExpenses = new ArrayList<>();
     private int userId;
     private NumberFormat vndFormat;

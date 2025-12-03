@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ExpenseReportAdapter extends RecyclerView.Adapter<ExpenseReportAdapter.ViewHolder> {
 
-    private List<Expense> expenseList;
+    private final List<Expense> expenseList;
 
     public ExpenseReportAdapter(List<Expense> expenseList) {
         this.expenseList = expenseList;

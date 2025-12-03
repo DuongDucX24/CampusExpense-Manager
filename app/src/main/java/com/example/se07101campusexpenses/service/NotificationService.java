@@ -23,7 +23,7 @@ import java.util.Locale; // Added import
 
 public class NotificationService extends Service {
     private static final String CHANNEL_ID = "BudgetChannel";
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private AppDatabase appDatabase;
     private int userId;
     private NumberFormat vndFormat; // Added for currency formatting

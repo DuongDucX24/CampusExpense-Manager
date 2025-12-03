@@ -27,7 +27,7 @@ public class AllBudgetsActivity extends AppCompatActivity {
 
     private static final String TAG = "AllBudgetsActivity";
     private BudgetRVAdapter budgetAdapter;
-    private List<Budget> allBudgets = new ArrayList<>();
+    private final List<Budget> allBudgets = new ArrayList<>();
     private BudgetRepository budgetRepository;
     private int userId;
 

@@ -17,12 +17,13 @@ import java.text.NumberFormat; // Added import
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.BudgetItemViewHolder> {
     private List<Budget> budgetModels;
     public Context context;
     public OnClickListener clickListener;
-    private NumberFormat vndFormat; // Added for currency formatting
+    private final NumberFormat vndFormat; // Added for currency formatting
 
     public interface OnClickListener {
         void onClick(int position, Budget budget); // Pass Budget object on click
@@ -105,7 +106,7 @@ public class BudgetRVAdapter extends RecyclerView.Adapter<BudgetRVAdapter.Budget
                         && equalsStr(o.getPeriod(), n.getPeriod())
                         && equalsStr(o.getDescription(), n.getDescription());
             }
-            private boolean equalsStr(String a, String b) { return a == null ? b == null : a.equals(b); }
+            private boolean equalsStr(String a, String b) { return Objects.equals(a, b); }
         });
         this.budgetModels = newList;
         diff.dispatchUpdatesTo(this);

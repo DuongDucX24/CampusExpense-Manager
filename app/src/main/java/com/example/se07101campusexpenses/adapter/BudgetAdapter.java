@@ -16,7 +16,7 @@ import java.util.Locale; // Added import
 
 public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetViewHolder> {
 
-    private List<Budget> budgetList; // Changed type to Budget
+    private final List<Budget> budgetList; // Changed type to Budget
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
@@ -59,9 +59,9 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.BudgetView
     }
 
     static class BudgetViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvBudgetName;
-        private TextView tvBudgetAmount;
-        private TextView tvBudgetPeriod;
+        private final TextView tvBudgetName;
+        private final TextView tvBudgetAmount;
+        private final TextView tvBudgetPeriod;
 
         public BudgetViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -28,7 +28,7 @@ public class AllExpensesActivity extends AppCompatActivity {
 
     private static final String TAG = "AllExpensesActivity";
     private ExpenseAdapter expenseAdapter;
-    private List<Expense> allExpenses = new ArrayList<>();
+    private final List<Expense> allExpenses = new ArrayList<>();
     private ExpenseRepository expenseRepository;
     private int userId;
 

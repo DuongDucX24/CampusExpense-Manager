@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     private static final String KEY_USER_ID = "user_id";
     private static final int DEFAULT_USER_ID = -1; // Indicates no user logged in
 
-    private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
 
@@ -87,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        executor = ContextCompat.getMainExecutor(this);
+        Executor executor = ContextCompat.getMainExecutor(this);
         biometricPrompt = new BiometricPrompt(LoginActivity.this,
                 executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -131,9 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Add a button for biometric login and set its click listener
         Button btnBiometricLogin = findViewById(R.id.btnBiometricLogin);
-        btnBiometricLogin.setOnClickListener(view -> {
-            biometricPrompt.authenticate(promptInfo);
-        });
+        btnBiometricLogin.setOnClickListener(view -> biometricPrompt.authenticate(promptInfo));
     }
 
     private void setupLoginButton() {
