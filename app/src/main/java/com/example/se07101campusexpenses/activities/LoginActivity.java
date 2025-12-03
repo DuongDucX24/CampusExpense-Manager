@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
@@ -100,18 +101,31 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthenticationSucceeded(
                     BiometricPrompt.AuthenticationResult result) {
-                // Assuming you have a way to get the user's details after successful biometric auth
-                // For now, let's just log in the last logged-in user if available
-                SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-                int userId = sharedPreferences.getInt(KEY_USER_ID, DEFAULT_USER_ID);
-                if (userId != DEFAULT_USER_ID) {
-                    Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "No user found for biometric login. Please log in manually first.", Toast.LENGTH_SHORT).show();
-                }
+                String usernameOrEmail = edtUsernameOrEmail.getText().toString().trim();
+                boolean isEmail = Patterns.EMAIL_ADDRESS.matcher(usernameOrEmail).matches();
+
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    final User finalUser = isEmail
+                            ? userRepository.getUserByEmail(usernameOrEmail)
+                            : userRepository.getUserByUsername(usernameOrEmail);
+
+                    runOnUiThread(() -> {
+                        if (finalUser != null) {
+                            SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt(KEY_USER_ID, finalUser.id);
+                            editor.apply();
+
+                            Toast.makeText(LoginActivity.this, "Biometric login successful", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "User not found. Please check username/email.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
             }
 
             @Override
