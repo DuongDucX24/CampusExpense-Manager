@@ -16,18 +16,24 @@
         android:padding="12dp"/>
 
     <Button
+        android:id="@+id/btnReformat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reformat Text"
+        android:layout_marginTop="12dp"/>
+
+    <Button
         android:id="@+id/btnImportFromText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Import from Text"
-        android:layout_marginTop="16dp"/>
+        android:text="Preview Import from Text"
+        android:layout_marginTop="12dp"/>
 
     <Button
         android:id="@+id/btnImportFromFile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Import from File"
+        android:text="Preview Import from File"
         android:layout_marginTop="8dp"/>
 
 </LinearLayout>
-
