@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.activities.LoginActivity;
+import com.example.se07101campusexpenses.activities.ImportActivity;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User;
@@ -50,6 +51,12 @@ public class ProfileFragment extends Fragment {
         Button btnLogout = view.findViewById(R.id.btnLogout);
         Button btnSendFeedback = view.findViewById(R.id.btnSendFeedback);
         Button btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
+        Button btnImport = view.findViewById(R.id.btnImport);
+
+        btnImport.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ImportActivity.class);
+            startActivity(intent);
+        });
 
         userRepository = new UserRepository(requireContext());
         userId = requireActivity().getSharedPreferences("user_prefs", 0).getInt("user_id", -1);
@@ -208,5 +215,11 @@ public class ProfileFragment extends Fragment {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         requireActivity().finish();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUserProfile();
     }
 }

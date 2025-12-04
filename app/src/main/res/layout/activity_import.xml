@@ -5,25 +5,29 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnImportFile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Import from .txt file" />
-
     <EditText
-        android:id="@+id/edtImportText"
+        android:id="@+id/etImportText"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:hint="Paste text here or import from file"
         android:gravity="top"
-        android:hint="Or paste your text here"
-        android:inputType="textMultiLine" />
+        android:background="@drawable/edit_text_background"
+        android:padding="12dp"/>
 
     <Button
-        android:id="@+id/btnProcessImport"
+        android:id="@+id/btnImportFromText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Process" />
+        android:text="Import from Text"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/btnImportFromFile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Import from File"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>
+

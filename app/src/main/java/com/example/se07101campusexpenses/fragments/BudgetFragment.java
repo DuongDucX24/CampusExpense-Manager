@@ -235,7 +235,7 @@ public class BudgetFragment extends Fragment {
     }
 
     private String[] getCurrentDayRange() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         Calendar cal = Calendar.getInstance();
         Date day = cal.getTime();
         String d = sdf.format(day);
@@ -243,7 +243,7 @@ public class BudgetFragment extends Fragment {
     }
 
     private String[] getCurrentWeekRange() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         Calendar cal = Calendar.getInstance();
         // make Monday the first day of week
         int dow = cal.get(Calendar.DAY_OF_WEEK); // 1=Sunday
@@ -256,7 +256,7 @@ public class BudgetFragment extends Fragment {
     }
 
     private String[] getCurrentMonthRange() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         Date start = cal.getTime();

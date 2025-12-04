@@ -57,4 +57,7 @@
     <color name="colorDelete">@color/md_theme_error</color> <!-- Using Material 3 error color -->
     <color name="colorTextWhite">#FFFFFF</color>
 
+    <!-- Missing color definitions -->
+    <color name="colorPrimary">@color/md_theme_primary</color>
+    <color name="colorDanger">@color/md_theme_error</color>
 </resources>
