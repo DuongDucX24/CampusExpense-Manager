@@ -147,9 +147,11 @@
         android:id="@+id/emptyStateContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="120dp"

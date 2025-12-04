@@ -107,6 +107,41 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Search icon"
+                    app:tint="@color/textColorSecondary" />
+
+                <EditText
+                    android:id="@+id/etSearchBudget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="Search budgets..."
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
     <!-- Empty State - Shown when no budgets exist -->
@@ -114,9 +149,11 @@
         android:id="@+id/emptyStateContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="120dp"

@@ -2,7 +2,7 @@ package com.example.se07101campusexpenses.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,14 +10,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,12 +41,14 @@ import java.util.regex.Pattern;
 public class ImportActivity extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
+    private static final int MAX_PREVIEW_ITEMS = 50; // Limit preview items to prevent OOM
     private EditText etImportText;
     private Button btnImportFromFile, btnImportFromText, btnReformat;
     private ExpenseRepository expenseRepository;
     private BudgetRepository budgetRepository;
     private int userId;
     private static final String TAG = "ImportActivity";
+    private static final Pattern INLINE_COMMAND_PATTERN = Pattern.compile("(?i)^(plus|minus)(?:\\s+(.*))?$");
 
     private enum EntryType { BUDGET, EXPENSE }
 
@@ -149,12 +149,12 @@ public class ImportActivity extends AppCompatActivity {
 
     private List<ParsedEntry> parseText(String text, List<String> errors) {
         String cleanedText = cleanText(text);
-        String[] lines = cleanedText.split("\n");
+        List<String> lines = explodeInlineCommands(cleanedText);
         List<ParsedEntry> parsedEntries = new ArrayList<>();
         EntryType currentType = null;
 
-        for (int i = 0; i < lines.length; i++) {
-            String originalLine = lines[i];
+        for (int i = 0; i < lines.size(); i++) {
+            String originalLine = lines.get(i);
             String line = originalLine.trim();
             if (line.isEmpty()) {
                 continue;
@@ -190,7 +190,8 @@ public class ImportActivity extends AppCompatActivity {
 
     private ParsedEntry parseLine(String line, EntryType type, String sourceLine, int lineNumber, List<String> errors) {
         String normalized = normalizeCurrencyTokens(line);
-        Pattern pattern = Pattern.compile("(\\d+[.,\\s]?)+(?:k|đ|d|vnd)?(?:(?:\\s*\\(.*))?)", Pattern.CASE_INSENSITIVE);
+        // Pattern to match amounts like "500k", "5000đ", "5.000", etc. with optional description in parentheses
+        Pattern pattern = Pattern.compile("(\\d+[.,\\s]?)+(?:k|đ|d|vnd)?(?:\\s*\\(.*)?", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(normalized);
         if (!matcher.find()) {
             errors.add("Line " + lineNumber + ": Could not parse amount in '" + sourceLine + "'");
@@ -241,42 +242,112 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     private void showPreviewDialog(List<ParsedEntry> entries, List<String> errors) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View view = inflater.inflate(R.layout.dialog_import_preview, null);
-        LinearLayout container = view.findViewById(R.id.previewContainer);
-        TextView tvErrors = view.findViewById(R.id.tvPreviewErrors);
+        try {
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View view = inflater.inflate(R.layout.dialog_import_preview, null);
+            LinearLayout container = view.findViewById(R.id.previewContainer);
+            TextView tvErrors = view.findViewById(R.id.tvPreviewErrors);
 
-        for (ParsedEntry entry : entries) {
-            View row = inflater.inflate(R.layout.item_import_preview, container, false);
-            TextView tvType = row.findViewById(R.id.tvPreviewType);
-            TextView tvAmount = row.findViewById(R.id.tvPreviewAmount);
-            TextView tvDescription = row.findViewById(R.id.tvPreviewDescription);
-            tvType.setText(entry.type == EntryType.BUDGET ? "Budget" : "Expense");
-            tvAmount.setText(String.format(Locale.getDefault(), "%.0f đ", entry.amount));
-            tvDescription.setText(TextUtils.isEmpty(entry.description) ? "(No description)" : entry.description);
-            container.addView(row);
+            if (container == null) {
+                Log.e(TAG, "Preview container is null. Cannot show preview.");
+                showErrors(List.of("An unexpected error occurred while preparing the preview."));
+                return;
+            }
+
+            // Count budgets and expenses
+            int budgetCount = 0;
+            int expenseCount = 0;
+            for (ParsedEntry entry : entries) {
+                if (entry.type == EntryType.BUDGET) budgetCount++;
+                else expenseCount++;
+            }
+
+            // Add summary header for large imports
+            if (entries.size() > MAX_PREVIEW_ITEMS) {
+                TextView summaryView = new TextView(this);
+                summaryView.setText(String.format(Locale.getDefault(),
+                    "📊 Import Summary:\n• %d budgets\n• %d expenses\n• %d total entries\n\nShowing first %d items:",
+                    budgetCount, expenseCount, entries.size(), MAX_PREVIEW_ITEMS));
+                summaryView.setTextSize(14);
+                summaryView.setPadding(0, 0, 0, 24);
+                container.addView(summaryView);
+            }
+
+            // Only show first MAX_PREVIEW_ITEMS to prevent OOM
+            int itemsToShow = Math.min(entries.size(), MAX_PREVIEW_ITEMS);
+            for (int i = 0; i < itemsToShow; i++) {
+                ParsedEntry entry = entries.get(i);
+                View row = inflater.inflate(R.layout.item_import_preview, container, false);
+                TextView tvType = row.findViewById(R.id.tvPreviewType);
+                TextView tvAmount = row.findViewById(R.id.tvPreviewAmount);
+                TextView tvDescription = row.findViewById(R.id.tvPreviewDescription);
+                tvType.setText(entry.type == EntryType.BUDGET ? "Budget" : "Expense");
+                tvAmount.setText(String.format(Locale.getDefault(), "%.0f đ", entry.amount));
+                tvDescription.setText(TextUtils.isEmpty(entry.description) ? "(No description)" : entry.description);
+                container.addView(row);
+            }
+
+            // Show how many more items if truncated
+            if (entries.size() > MAX_PREVIEW_ITEMS) {
+                TextView moreView = new TextView(this);
+                moreView.setText(String.format(Locale.getDefault(),
+                    "\n... and %d more entries", entries.size() - MAX_PREVIEW_ITEMS));
+                moreView.setTextSize(14);
+                moreView.setPadding(0, 16, 0, 0);
+                container.addView(moreView);
+            }
+
+            if (tvErrors != null) {
+                if (!errors.isEmpty()) {
+                    tvErrors.setVisibility(View.VISIBLE);
+                    // Limit error display to first 10 errors
+                    int errorsToShow = Math.min(errors.size(), 10);
+                    StringBuilder errorText = new StringBuilder();
+                    for (int i = 0; i < errorsToShow; i++) {
+                        errorText.append(errors.get(i)).append("\n");
+                    }
+                    if (errors.size() > 10) {
+                        errorText.append(String.format(Locale.getDefault(), "... and %d more errors", errors.size() - 10));
+                    }
+                    tvErrors.setText(errorText.toString().trim());
+                } else {
+                    tvErrors.setVisibility(View.GONE);
+                }
+            }
+
+            String dialogTitle = String.format(Locale.getDefault(), "Import Preview (%d items)", entries.size());
+            new AlertDialog.Builder(this)
+                    .setTitle(dialogTitle)
+                    .setView(view)
+                    .setPositiveButton("Import All", (dialog, which) -> persistEntries(entries))
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing preview dialog", e);
+            showErrors(List.of("Failed to show preview due to an internal error: " + e.getMessage()));
         }
-
-        if (!errors.isEmpty()) {
-            tvErrors.setVisibility(View.VISIBLE);
-            tvErrors.setText(TextUtils.join("\n", errors));
-        } else {
-            tvErrors.setVisibility(View.GONE);
-        }
-
-        new AlertDialog.Builder(this)
-                .setTitle("Import Preview")
-                .setView(view)
-                .setPositiveButton("Import", (dialog, which) -> persistEntries(entries))
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     private void persistEntries(List<ParsedEntry> entries) {
+        // Show progress dialog for large imports
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Importing Data");
+        progressDialog.setMessage("Please wait...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMax(entries.size());
+        progressDialog.setProgress(0);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         AppDatabase.databaseWriteExecutor.execute(() -> {
             int budgets = 0;
             int expenses = 0;
-            for (ParsedEntry entry : entries) {
+            int failed = 0;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String currentDate = dateFormat.format(new Date());
+
+            for (int i = 0; i < entries.size(); i++) {
+                ParsedEntry entry = entries.get(i);
                 try {
                     if (entry.type == EntryType.BUDGET) {
                         Budget budget = new Budget();
@@ -284,7 +355,7 @@ public class ImportActivity extends AppCompatActivity {
                         budget.setName(entry.description);
                         budget.setAmount(entry.amount);
                         budget.setPeriod("Monthly");
-                        budgetRepository.insert(budget);
+                        budgetRepository.insertSync(budget);
                         budgets++;
                     } else {
                         Expense expense = new Expense();
@@ -292,20 +363,39 @@ public class ImportActivity extends AppCompatActivity {
                         expense.setAmount(entry.amount);
                         expense.setDescription(entry.description);
                         expense.setCategory("Imported");
-                        expense.setDate(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date()));
-                        expenseRepository.addExpense(expense);
+                        expense.setDate(currentDate);
+                        expenseRepository.addExpenseSync(expense);
                         expenses++;
                     }
                 } catch (Exception e) {
+                    failed++;
                     Log.w(TAG, "Failed to persist entry: " + entry.sourceLine, e);
+                }
+
+                // Update progress every 10 items to reduce UI overhead
+                if (i % 10 == 0 || i == entries.size() - 1) {
+                    int progress = i + 1;
+                    runOnUiThread(() -> {
+                        progressDialog.setProgress(progress);
+                        progressDialog.setMessage(String.format(Locale.getDefault(),
+                            "Importing %d of %d...", progress, entries.size()));
+                    });
                 }
             }
 
             int finalBudgets = budgets;
             int finalExpenses = expenses;
+            int finalFailed = failed;
             runOnUiThread(() -> {
-                Toast.makeText(this, "Imported " + finalBudgets + " budgets, " + finalExpenses + " expenses", Toast.LENGTH_LONG).show();
-                Log.i(TAG, "Import complete: budgets=" + finalBudgets + ", expenses=" + finalExpenses);
+                progressDialog.dismiss();
+                String message = String.format(Locale.getDefault(),
+                    "Import complete!\n• %d budgets added\n• %d expenses added",
+                    finalBudgets, finalExpenses);
+                if (finalFailed > 0) {
+                    message += String.format(Locale.getDefault(), "\n• %d failed", finalFailed);
+                }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Import complete: budgets=" + finalBudgets + ", expenses=" + finalExpenses + ", failed=" + finalFailed);
                 finish();
             });
         });
@@ -320,19 +410,10 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     private String reformatInput(String text) {
-        String cleaned = cleanText(text);
         StringBuilder output = new StringBuilder();
-        String[] lines = cleaned.split("\n");
-        for (String line : lines) {
+        for (String line : explodeInlineCommands(cleanText(text))) {
             String normalized = normalizeCurrencyTokens(line.trim());
-            if (normalized.isEmpty()) {
-                continue;
-            }
-            if (normalized.matches("(?i)^(plus|minus)\\s+\\d")) {
-                int firstSpace = normalized.indexOf(' ');
-                output.append(normalized, 0, firstSpace).append("\n");
-                output.append(normalized.substring(firstSpace + 1)).append("\n");
-            } else {
+            if (!normalized.isEmpty()) {
                 output.append(normalized).append("\n");
             }
         }
@@ -340,23 +421,56 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     private String normalizeCurrencyTokens(String line) {
-        String normalized = line
+        return line
                 .replace("__đ__", "đ")
                 .replaceAll("(?i)vnd", "đ")
-                .replaceAll("(?i)d", "đ")
-                .replaceAll("đđ", "đ")
-                .replaceAll("\s+", " ")
+                .replaceAll("\\s+", " ")
                 .trim();
-        return normalized;
     }
 
     private String cleanText(String text) {
         StringBuilder cleanedText = new StringBuilder();
         String[] lines = text.split("\n");
         for (String line : lines) {
-            line = line.replaceAll("\\[\\d{2}:\\d{2}\\]", "");
-            cleanedText.append(line).append("\n");
+            String sanitized = line
+                    .replaceAll("\\[\\d{2}:\\d{2}\\]", "")
+                    .replaceAll("\\u2022", "") // bullet
+                    .trim();
+            if (!sanitized.isEmpty()) {
+                cleanedText.append(sanitized).append("\n");
+            }
         }
         return cleanedText.toString();
+    }
+
+    private List<String> explodeInlineCommands(String text) {
+        List<String> result = new ArrayList<>();
+        String[] rawLines = text.split("\n");
+        for (String raw : rawLines) {
+            String line = raw.trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            Matcher matcher = INLINE_COMMAND_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                String keyword = capitalizeCommand(matcher.group(1));
+                String remainder = matcher.group(2);
+                result.add(keyword);
+                if (!TextUtils.isEmpty(remainder)) {
+                    result.add(remainder.trim());
+                }
+            } else {
+                result.add(line);
+            }
+        }
+        return result;
+    }
+
+    private String capitalizeCommand(String keyword) {
+        if (TextUtils.isEmpty(keyword)) {
+            return keyword;
+        }
+        String lower = keyword.toLowerCase(Locale.US);
+        return lower.substring(0, 1).toUpperCase(Locale.US) + lower.substring(1);
     }
 }
