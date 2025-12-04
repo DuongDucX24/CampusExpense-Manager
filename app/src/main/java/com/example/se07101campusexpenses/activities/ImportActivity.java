@@ -41,24 +41,30 @@ import java.util.regex.Pattern;
 public class ImportActivity extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
-    private static final int MAX_PREVIEW_ITEMS = 50; // Limit preview items to prevent OOM
+    private static final int MAX_PREVIEW_ITEMS = 50;
     private EditText etImportText;
     private Button btnImportFromFile, btnImportFromText, btnReformat;
     private ExpenseRepository expenseRepository;
     private BudgetRepository budgetRepository;
     private int userId;
     private static final String TAG = "ImportActivity";
-    private static final Pattern INLINE_COMMAND_PATTERN = Pattern.compile("(?i)^(plus|minus)(?:\\s+(.*))?$");
+
+    // Regex patterns for cleaning and parsing
+    private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("\\[\\d{4}\\]");
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("\\d{8}_\\d{6}\\.(jpg|png|jpeg)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STANDALONE_BRACKET_PATTERN = Pattern.compile("^(\\[\\d+\\]\\s*)+$");
+    private static final Pattern SIGN_PATTERN = Pattern.compile("(?i)^(plus|minus)\\s+(.*)$");
+    private static final Pattern AMOUNT_PATTERN = Pattern.compile("^([\\d.,]+)(k|đ|d)?", Pattern.CASE_INSENSITIVE);
 
     private enum EntryType { BUDGET, EXPENSE }
 
     private static class ParsedEntry {
         final EntryType type;
-        final double amount;
+        final long amount;
         final String description;
         final String sourceLine;
 
-        ParsedEntry(EntryType type, double amount, String description, String sourceLine) {
+        ParsedEntry(EntryType type, long amount, String description, String sourceLine) {
             this.type = type;
             this.amount = amount;
             this.description = description;
@@ -148,97 +154,159 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     private List<ParsedEntry> parseText(String text, List<String> errors) {
-        String cleanedText = cleanText(text);
-        List<String> lines = explodeInlineCommands(cleanedText);
+        String cleanedText = cleanInput(text);
+        String[] lines = cleanedText.split("\n");
         List<ParsedEntry> parsedEntries = new ArrayList<>();
         EntryType currentType = null;
+        boolean isFirstEntry = true;
 
-        for (int i = 0; i < lines.size(); i++) {
-            String originalLine = lines.get(i);
-            String line = originalLine.trim();
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
             if (line.isEmpty()) {
                 continue;
             }
 
-            String lower = line.toLowerCase(Locale.US);
-            if (lower.equals("plus")) {
-                currentType = EntryType.BUDGET;
+            // Skip standalone bracket entries like [1234]
+            if (STANDALONE_BRACKET_PATTERN.matcher(line).matches()) {
                 continue;
-            } else if (lower.equals("minus")) {
-                currentType = EntryType.EXPENSE;
-                continue;
-            } else if (lower.startsWith("plus ")) {
-                currentType = EntryType.BUDGET;
-                line = line.substring(5).trim();
-            } else if (lower.startsWith("minus ")) {
-                currentType = EntryType.EXPENSE;
-                line = line.substring(6).trim();
             }
 
+            // Skip image filenames
+            if (IMAGE_PATTERN.matcher(line).find() && !line.contains("(")) {
+                continue;
+            }
+
+            // Check for Plus/Minus prefix
+            String workingLine = line;
+            boolean hasExplicitSign = false;
+
+            Matcher signMatcher = SIGN_PATTERN.matcher(line);
+            if (signMatcher.matches()) {
+                String sign = signMatcher.group(1).toLowerCase(Locale.US);
+                currentType = sign.equals("plus") ? EntryType.BUDGET : EntryType.EXPENSE;
+                workingLine = signMatcher.group(2).trim();
+                hasExplicitSign = true;
+            } else if (line.toLowerCase(Locale.US).equals("plus")) {
+                currentType = EntryType.BUDGET;
+                continue; // Just a sign marker, no amount
+            } else if (line.toLowerCase(Locale.US).equals("minus")) {
+                currentType = EntryType.EXPENSE;
+                continue; // Just a sign marker, no amount
+            }
+
+            // First entry must have explicit sign
+            if (isFirstEntry && !hasExplicitSign) {
+                errors.add("Line " + (i + 1) + ": First entry must have explicit Plus or Minus");
+                continue;
+            }
+
+            // If no sign and not first, inherit from previous
             if (currentType == null) {
                 errors.add("Line " + (i + 1) + ": Missing Plus/Minus context");
                 continue;
             }
 
-            ParsedEntry entry = parseLine(line, currentType, originalLine, i + 1, errors);
+            // Parse the entry
+            ParsedEntry entry = parseLine(workingLine, currentType, line, i + 1, errors);
             if (entry != null) {
                 parsedEntries.add(entry);
+                isFirstEntry = false;
             }
         }
         return parsedEntries;
     }
 
     private ParsedEntry parseLine(String line, EntryType type, String sourceLine, int lineNumber, List<String> errors) {
-        String normalized = normalizeCurrencyTokens(line);
-        // Pattern to match amounts like "500k", "5000đ", "5.000", etc. with optional description in parentheses
-        Pattern pattern = Pattern.compile("(\\d+[.,\\s]?)+(?:k|đ|d|vnd)?(?:\\s*\\(.*)?", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(normalized);
-        if (!matcher.find()) {
+        // Extract description from parentheses (open or closed)
+        String description = extractDescription(line);
+
+        // Get the amount part (everything before the first '(' or the whole line)
+        int parenIndex = line.indexOf('(');
+        String amountPart = parenIndex > 0 ? line.substring(0, parenIndex).trim() : line.trim();
+
+        // Clean the amount part - remove any non-amount text
+        amountPart = cleanAmountString(amountPart);
+
+        // Parse the amount
+        long amount = parseAmount(amountPart);
+        if (amount <= 0) {
             errors.add("Line " + lineNumber + ": Could not parse amount in '" + sourceLine + "'");
             return null;
         }
 
-        ParsedAmount amount = extractAmountAndDescription(normalized);
-        if (amount == null) {
-            errors.add("Line " + lineNumber + ": Invalid amount format in '" + sourceLine + "'");
+        return new ParsedEntry(type, amount, description != null ? description : "", sourceLine);
+    }
+
+    /**
+     * Extracts description from parentheses - handles both (desc) and (desc without closing
+     */
+    private String extractDescription(String line) {
+        int openIndex = line.indexOf('(');
+        if (openIndex == -1) {
             return null;
         }
 
-        return new ParsedEntry(type, amount.value, amount.description, sourceLine);
-    }
-
-    private static class ParsedAmount {
-        final double value;
-        final String description;
-
-        ParsedAmount(double value, String description) {
-            this.value = value;
-            this.description = description;
+        int closeIndex = line.lastIndexOf(')');
+        if (closeIndex > openIndex) {
+            return line.substring(openIndex + 1, closeIndex).trim();
+        } else {
+            // Unclosed bracket - take everything after (
+            return line.substring(openIndex + 1).trim();
         }
     }
 
-    private ParsedAmount extractAmountAndDescription(String line) {
-        Pattern amountPattern = Pattern.compile("(\\d+(?:[.,\\s]\\d+)*)(k|đ|d|vnd)?", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = amountPattern.matcher(line);
-        if (!matcher.find()) {
-            return null;
+    /**
+     * Cleans the amount string by removing non-amount text
+     */
+    private String cleanAmountString(String amountPart) {
+        // Remove timestamps like [1234]
+        amountPart = TIMESTAMP_PATTERN.matcher(amountPart).replaceAll("");
+
+        // Remove extra text after the amount (like "on 07-04-2025")
+        Matcher matcher = AMOUNT_PATTERN.matcher(amountPart.trim());
+        if (matcher.find()) {
+            return matcher.group(0);
+        }
+        return amountPart.trim();
+    }
+
+    /**
+     * Parses amount string to long value
+     * Handles: 5k, 5.5k, 5000đ, 5.083đ, 12.771.000đ
+     * Treats . and , as thousands separators
+     */
+    private long parseAmount(String amountStr) {
+        if (amountStr == null || amountStr.isEmpty()) {
+            return 0;
         }
 
-        String rawNumber = matcher.group(1).replaceAll("[.,\\s]", "");
-        double amount = Double.parseDouble(rawNumber);
-        String suffix = matcher.group(2);
-        if (suffix != null && suffix.equalsIgnoreCase("k")) {
-            amount *= 1000;
+        amountStr = amountStr.toLowerCase(Locale.US).trim();
+
+        // Check for k suffix (multiply by 1000)
+        boolean hasK = amountStr.endsWith("k");
+
+        // Remove currency suffixes
+        amountStr = amountStr.replaceAll("[đd]$", "");
+        if (hasK) {
+            amountStr = amountStr.substring(0, amountStr.length() - 1);
         }
 
-        String description = line.substring(matcher.end()).trim();
-        if (description.startsWith("(")) {
-            description = description.substring(1);
+        // Remove thousands separators (both . and ,)
+        amountStr = amountStr.replace(".", "").replace(",", "");
+
+        if (amountStr.isEmpty()) {
+            return 0;
         }
-        if (description.endsWith(")")) {
-            description = description.substring(0, description.length() - 1);
+
+        try {
+            long value = Long.parseLong(amountStr);
+            if (hasK) {
+                value *= 1000;
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            return 0;
         }
-        return new ParsedAmount(amount, description);
     }
 
     private void showPreviewDialog(List<ParsedEntry> entries, List<String> errors) {
@@ -282,7 +350,7 @@ public class ImportActivity extends AppCompatActivity {
                 TextView tvAmount = row.findViewById(R.id.tvPreviewAmount);
                 TextView tvDescription = row.findViewById(R.id.tvPreviewDescription);
                 tvType.setText(entry.type == EntryType.BUDGET ? "Budget" : "Expense");
-                tvAmount.setText(String.format(Locale.getDefault(), "%.0f đ", entry.amount));
+                tvAmount.setText(String.format(Locale.getDefault(), "%,d đ", entry.amount));
                 tvDescription.setText(TextUtils.isEmpty(entry.description) ? "(No description)" : entry.description);
                 container.addView(row);
             }
@@ -411,66 +479,44 @@ public class ImportActivity extends AppCompatActivity {
 
     private String reformatInput(String text) {
         StringBuilder output = new StringBuilder();
-        for (String line : explodeInlineCommands(cleanText(text))) {
-            String normalized = normalizeCurrencyTokens(line.trim());
-            if (!normalized.isEmpty()) {
-                output.append(normalized).append("\n");
+        String cleaned = cleanInput(text);
+        String[] lines = cleaned.split("\n");
+        for (String line : lines) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+                output.append(line).append("\n");
             }
         }
         return output.toString().trim();
     }
 
-    private String normalizeCurrencyTokens(String line) {
-        return line
-                .replace("__đ__", "đ")
-                .replaceAll("(?i)vnd", "đ")
-                .replaceAll("\\s+", " ")
-                .trim();
-    }
-
-    private String cleanText(String text) {
+    /**
+     * Cleans input text by removing unwanted patterns
+     */
+    private String cleanInput(String text) {
         StringBuilder cleanedText = new StringBuilder();
         String[] lines = text.split("\n");
+
         for (String line : lines) {
-            String sanitized = line
-                    .replaceAll("\\[\\d{2}:\\d{2}\\]", "")
-                    .replaceAll("\\u2022", "") // bullet
-                    .trim();
-            if (!sanitized.isEmpty()) {
+            String sanitized = line;
+
+            // Remove timestamps like [1234], [0555], etc.
+            sanitized = TIMESTAMP_PATTERN.matcher(sanitized).replaceAll("");
+
+            // Remove image filenames like 20250903_155805.jpg
+            sanitized = IMAGE_PATTERN.matcher(sanitized).replaceAll("");
+
+            // Remove bullet points
+            sanitized = sanitized.replace("\u2022", "");
+
+            // Trim whitespace
+            sanitized = sanitized.trim();
+
+            // Skip empty lines and standalone bracket entries
+            if (!sanitized.isEmpty() && !STANDALONE_BRACKET_PATTERN.matcher(sanitized).matches()) {
                 cleanedText.append(sanitized).append("\n");
             }
         }
         return cleanedText.toString();
-    }
-
-    private List<String> explodeInlineCommands(String text) {
-        List<String> result = new ArrayList<>();
-        String[] rawLines = text.split("\n");
-        for (String raw : rawLines) {
-            String line = raw.trim();
-            if (line.isEmpty()) {
-                continue;
-            }
-            Matcher matcher = INLINE_COMMAND_PATTERN.matcher(line);
-            if (matcher.matches()) {
-                String keyword = capitalizeCommand(matcher.group(1));
-                String remainder = matcher.group(2);
-                result.add(keyword);
-                if (!TextUtils.isEmpty(remainder)) {
-                    result.add(remainder.trim());
-                }
-            } else {
-                result.add(line);
-            }
-        }
-        return result;
-    }
-
-    private String capitalizeCommand(String keyword) {
-        if (TextUtils.isEmpty(keyword)) {
-            return keyword;
-        }
-        String lower = keyword.toLowerCase(Locale.US);
-        return lower.substring(0, 1).toUpperCase(Locale.US) + lower.substring(1);
     }
 }

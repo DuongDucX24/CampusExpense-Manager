@@ -2,6 +2,7 @@ package com.example.se07101campusexpenses.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,8 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +37,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -39,17 +45,27 @@ import java.util.stream.Collectors;
 public class ExpensesFragment extends Fragment {
 
     private static final String TAG = "ExpensesFragment";
+    private static final String PREF_EXPENSE_SORT = "expense_sort_order";
+
+    // Sort order constants
+    private static final int SORT_AMOUNT_LOW_HIGH = 0;
+    private static final int SORT_AMOUNT_HIGH_LOW = 1;
+    private static final int SORT_NAME_A_Z = 2;
+    private static final int SORT_NAME_Z_A = 3;
+
     private ExpenseRepository expenseRepository;
     private ExpenseAdapter expenseAdapter;
     private LinearLayout emptyStateContainer;
     private LinearLayout contentLayout;
     private LinearLayout expensesContainer;
     private TextView tvTotalSpent, tvExpenseCount;
-    private TextView tvShowMoreExpenses;
     private EditText etSearchExpense;
+    private Spinner spinnerSortExpense;
+    private Button btnViewAllExpenses;
     private final List<Expense> allExpenses = new ArrayList<>();
     private List<Expense> filteredExpenses = new ArrayList<>();
     private int userId;
+    private int currentSortOrder = SORT_AMOUNT_HIGH_LOW;
     private NumberFormat vndFormat;
     private static final int MAX_ITEMS_TO_SHOW = 4;
 
@@ -67,7 +83,6 @@ public class ExpensesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_expenses, container, false);
     }
 
@@ -76,7 +91,7 @@ public class ExpensesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         try {
-            // Find all UI components for new layout
+            // Find all UI components
             FloatingActionButton fabAddExpense = view.findViewById(R.id.fabAddExpense);
             emptyStateContainer = view.findViewById(R.id.emptyStateContainer);
             contentLayout = view.findViewById(R.id.contentLayout);
@@ -84,16 +99,22 @@ public class ExpensesFragment extends Fragment {
             tvTotalSpent = view.findViewById(R.id.tvTotalSpent);
             tvExpenseCount = view.findViewById(R.id.tvExpenseCount);
             etSearchExpense = view.findViewById(R.id.etSearchExpense);
-            tvShowMoreExpenses = view.findViewById(R.id.tvShowMoreExpenses);
+            spinnerSortExpense = view.findViewById(R.id.spinnerSortExpense);
+            btnViewAllExpenses = view.findViewById(R.id.btnViewAllExpenses);
 
             userId = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE).getInt("user_id", -1);
             expenseRepository = new ExpenseRepository(requireContext());
-
-            // Create the adapter for reference (but won't use recyclerView anymore)
             expenseAdapter = new ExpenseAdapter();
 
-            // Set up "Show More" button
-            tvShowMoreExpenses.setOnClickListener(v -> {
+            // Load saved sort preference
+            SharedPreferences prefs = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+            currentSortOrder = prefs.getInt(PREF_EXPENSE_SORT, SORT_AMOUNT_HIGH_LOW);
+
+            // Setup sort spinner
+            setupSortSpinner();
+
+            // Set up View All button
+            btnViewAllExpenses.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), AllExpensesActivity.class);
                 startActivity(intent);
             });
@@ -127,28 +148,75 @@ public class ExpensesFragment extends Fragment {
         }
     }
 
+    private void setupSortSpinner() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.sort_options,
+                android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSortExpense.setAdapter(adapter);
+        spinnerSortExpense.setSelection(currentSortOrder);
+
+        spinnerSortExpense.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != currentSortOrder) {
+                    currentSortOrder = position;
+                    saveSortPreference();
+                    sortExpenses();
+                    updateExpenseDisplay();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void saveSortPreference() {
+        requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                .edit()
+                .putInt(PREF_EXPENSE_SORT, currentSortOrder)
+                .apply();
+    }
+
+    private void sortExpenses() {
+        switch (currentSortOrder) {
+            case SORT_AMOUNT_LOW_HIGH:
+                Collections.sort(filteredExpenses, (a, b) -> Double.compare(a.getAmount(), b.getAmount()));
+                break;
+            case SORT_AMOUNT_HIGH_LOW:
+                Collections.sort(filteredExpenses, (a, b) -> Double.compare(b.getAmount(), a.getAmount()));
+                break;
+            case SORT_NAME_A_Z:
+                Collections.sort(filteredExpenses, (a, b) ->
+                    a.getDescription().compareToIgnoreCase(b.getDescription()));
+                break;
+            case SORT_NAME_Z_A:
+                Collections.sort(filteredExpenses, (a, b) ->
+                    b.getDescription().compareToIgnoreCase(a.getDescription()));
+                break;
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        loadExpenses(); // Refresh when returning to the fragment
+        loadExpenses();
     }
 
     private void loadExpenses() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             try {
-                // Get current month's bounds
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-                // Set to first day of month
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
                 String startDate = dateFormat.format(calendar.getTime());
 
-                // Set to last day of month
                 calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
                 String endDate = dateFormat.format(calendar.getTime());
 
-                // Clear and load new data
                 allExpenses.clear();
                 filteredExpenses.clear();
 
@@ -158,7 +226,6 @@ public class ExpensesFragment extends Fragment {
                     filteredExpenses.addAll(expenses);
                 }
 
-                // Calculate total amount
                 double totalAmount = 0;
                 for (Expense expense : allExpenses) {
                     totalAmount += expense.getAmount();
@@ -167,18 +234,13 @@ public class ExpensesFragment extends Fragment {
                 final double finalTotalAmount = totalAmount;
                 final boolean isEmpty = allExpenses.isEmpty();
 
-                // Update UI on main thread if fragment is still attached
                 if (isAdded() && getActivity() != null) {
                     requireActivity().runOnUiThread(() -> {
                         try {
-                            // Update expense display with limited items
+                            sortExpenses();
                             updateExpenseDisplay();
-
-                            // Update summary data
                             tvTotalSpent.setText(vndFormat.format(finalTotalAmount));
                             tvExpenseCount.setText(String.valueOf(allExpenses.size()));
-
-                            // Toggle empty state visibility
                             toggleEmptyState(isEmpty);
                         } catch (Exception e) {
                             Log.e(TAG, "Error updating UI with expense data: " + e.getMessage(), e);
@@ -192,42 +254,32 @@ public class ExpensesFragment extends Fragment {
     }
 
     private void updateExpenseDisplay() {
-        if (!filteredExpenses.isEmpty()) {
-            // Clear container
-            expensesContainer.removeAllViews();
+        expensesContainer.removeAllViews();
 
-            // Show limited number of items
+        if (!filteredExpenses.isEmpty()) {
             int itemsToShow = Math.min(filteredExpenses.size(), MAX_ITEMS_TO_SHOW);
 
-            // Add expense items to container
             for (int i = 0; i < itemsToShow; i++) {
                 Expense expense = filteredExpenses.get(i);
                 View expenseItemView = createExpenseItemView(expense);
                 expensesContainer.addView(expenseItemView);
             }
-
-            // Show/hide "Show More" button
-            tvShowMoreExpenses.setVisibility(filteredExpenses.size() > MAX_ITEMS_TO_SHOW ? View.VISIBLE : View.GONE);
         }
     }
 
     private View createExpenseItemView(Expense expense) {
-        // Inflate a layout for individual expense items with the proper parent
         View itemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_expense, expensesContainer, false);
 
-        // Get references to views in the item layout
         TextView tvTitle = itemView.findViewById(R.id.tvExpenseTitle);
         TextView tvAmount = itemView.findViewById(R.id.tvExpenseAmount);
         TextView tvCategory = itemView.findViewById(R.id.tvExpenseCategory);
         TextView tvDate = itemView.findViewById(R.id.tvExpenseDate);
 
-        // Populate with expense data
         tvTitle.setText(expense.getDescription());
         tvAmount.setText(vndFormat.format(expense.getAmount()));
         tvCategory.setText(expense.getCategory());
         tvDate.setText(expense.getDate());
 
-        // Set click listener
         itemView.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditExpenseActivity.class);
             intent.putExtra("expense", expense);
@@ -246,9 +298,11 @@ public class ExpensesFragment extends Fragment {
             filteredExpenses = allExpenses.stream()
                     .filter(expense ->
                         expense.getDescription().toLowerCase(Locale.ROOT).contains(lowerCaseQuery) ||
-                        expense.getCategory().toLowerCase(Locale.ROOT).contains(lowerCaseQuery))
+                        expense.getCategory().toLowerCase(Locale.ROOT).contains(lowerCaseQuery) ||
+                        String.valueOf((long) expense.getAmount()).contains(query))
                     .collect(Collectors.toList());
         }
+        sortExpenses();
         updateExpenseDisplay();
         toggleEmptyState(filteredExpenses.isEmpty());
     }
@@ -263,3 +317,4 @@ public class ExpensesFragment extends Fragment {
         }
     }
 }
+

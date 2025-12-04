@@ -77,4 +77,12 @@
     <string name="btn_reset_password">Reset Password</string>
     <string name="hint_username_or_email">Username or Email</string>
     <string name="btn_login">Login</string>
+
+    <!-- Sort options for Budget and Expense lists -->
+    <string-array name="sort_options">
+        <item>Amount ↑</item>
+        <item>Amount ↓</item>
+        <item>Name A-Z</item>
+        <item>Name Z-A</item>
+    </string-array>
 </resources>
