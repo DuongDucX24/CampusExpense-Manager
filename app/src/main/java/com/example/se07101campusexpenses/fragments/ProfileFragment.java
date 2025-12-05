@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.activities.LoginActivity;
 import com.example.se07101campusexpenses.activities.ImportActivity;
+import com.example.se07101campusexpenses.activities.ExportActivity;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.UserRepository;
 import com.example.se07101campusexpenses.model.User;
@@ -52,9 +53,15 @@ public class ProfileFragment extends Fragment {
         Button btnSendFeedback = view.findViewById(R.id.btnSendFeedback);
         Button btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
         Button btnImport = view.findViewById(R.id.btnImport);
+        Button btnExport = view.findViewById(R.id.btnExport);
 
         btnImport.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ImportActivity.class);
+            startActivity(intent);
+        });
+
+        btnExport.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ExportActivity.class);
             startActivity(intent);
         });
 

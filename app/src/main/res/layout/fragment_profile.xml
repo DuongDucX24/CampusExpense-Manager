@@ -171,7 +171,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Import"
+                        android:text="Import &amp; Export"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:layout_marginBottom="8dp"/>
@@ -182,6 +182,18 @@
                         android:layout_height="wrap_content"
                         android:text="Import Data"
                         android:drawableStart="@android:drawable/ic_menu_upload"
+                        android:drawablePadding="8dp"
+                        android:padding="12dp"
+                        android:backgroundTint="@color/colorButton"
+                        android:textColor="@color/colorButtonText"/>
+
+                    <Button
+                        android:id="@+id/btnExport"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Export Data"
+                        android:drawableStart="@android:drawable/ic_menu_save"
                         android:drawablePadding="8dp"
                         android:padding="12dp"
                         android:backgroundTint="@color/colorButton"
