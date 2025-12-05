@@ -41,7 +41,6 @@ build/
 app/build/
 
 # Ignore Gradle build caches and daemons
-/gradle/
 /gradlew
 /gradlew.bat
 !/gradle/wrapper/gradle-wrapper.jar
