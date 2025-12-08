@@ -8,10 +8,14 @@ import java.util.concurrent.Future;
 
 public class UserRepository {
     private final UserDao userDao;
+    private final BudgetDao budgetDao;
+    private final ExpenseDao expenseDao;
 
     public UserRepository(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
         userDao = db.userDao();
+        budgetDao = db.budgetDao();
+        expenseDao = db.expenseDao();
     }
 
     public void saveUserAccount(final User user) {
@@ -109,5 +113,13 @@ public class UserRepository {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public void deleteUserAccount(final int userId) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            budgetDao.deleteByUserId(userId);
+            expenseDao.deleteByUserId(userId);
+            userDao.delete(userId);
+        });
     }
 }

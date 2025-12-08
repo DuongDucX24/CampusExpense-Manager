@@ -25,6 +25,13 @@ public class ExpenseRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.insert(expense));
     }
 
+    /**
+     * Synchronous insert for use when already on a background thread (e.g., bulk imports)
+     */
+    public void addExpenseSync(final Expense expense) {
+        expenseDao.insert(expense);
+    }
+
     public void updateExpense(final Expense expense) {
         AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.update(expense));
     }

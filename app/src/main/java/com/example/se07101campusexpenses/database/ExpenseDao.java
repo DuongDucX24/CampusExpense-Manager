@@ -59,6 +59,9 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE date BETWEEN :startDate AND :endDate")
     List<Expense> getExpensesBetweenDates(String startDate, String endDate); // Global, or add userId
 
+    @Query("SELECT * FROM expenses WHERE date BETWEEN :startDate AND :endDate AND userId = :userId ORDER BY date DESC")
+    List<Expense> getExpensesBetweenDatesForUser(String startDate, String endDate, int userId);
+
     @Query("SELECT category, SUM(amount) as amount FROM expenses WHERE date BETWEEN :startDate AND :endDate GROUP BY category")
     List<CategorySum> getExpensesByCategoryBetweenDates(String startDate, String endDate); // Global, or add userId
 
@@ -89,4 +92,7 @@ public interface ExpenseDao {
     // New helper for deletion constraints
     @Query("SELECT COUNT(*) FROM expenses WHERE budgetId = :budgetId")
     int countByBudgetId(int budgetId);
+
+    @Query("DELETE FROM expenses WHERE userId = :userId")
+    void deleteByUserId(int userId);
 }

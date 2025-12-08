@@ -32,4 +32,7 @@ public interface UserDao {
 
     @Query("SELECT COUNT(*) FROM users")
     int getUserCount();
+
+    @Query("DELETE FROM users WHERE id = :userId")
+    void delete(int userId);
 }

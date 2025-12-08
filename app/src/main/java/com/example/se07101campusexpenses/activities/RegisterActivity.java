@@ -30,7 +30,8 @@ public class RegisterActivity extends AppCompatActivity {
     Button btnPerformRegister, btnBackToLogin;
     private UserRepository userRepository;
 
-    // Define password validation pattern - at least one special character
+    // Define username and password validation patterns
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9]+$");
     private static final Pattern SPECIAL_CHAR_PATTERN = Pattern.compile("[^a-zA-Z0-9]");
 
     @Override
@@ -79,6 +80,11 @@ public class RegisterActivity extends AppCompatActivity {
         // Validate username (at least 3 characters)
         if (username.length() < 3) {
             Toast.makeText(this, "Username must be at least 3 characters long", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!USERNAME_PATTERN.matcher(username).matches()) {
+            Toast.makeText(this, "Username can only contain letters and numbers", Toast.LENGTH_SHORT).show();
             return;
         }
 

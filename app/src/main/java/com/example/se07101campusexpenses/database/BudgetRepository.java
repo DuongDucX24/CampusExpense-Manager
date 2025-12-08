@@ -34,6 +34,13 @@ public class BudgetRepository {
         });
     }
 
+    /**
+     * Synchronous insert for use when already on a background thread (e.g., bulk imports)
+     */
+    public void insertSync(final Budget budget) {
+        budgetDao.insert(budget);
+    }
+
     public void update(final Budget budget) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             budgetDao.update(budget);

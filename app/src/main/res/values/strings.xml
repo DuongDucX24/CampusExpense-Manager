@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SE07101CampusExpenses</string>
+    <string name="app_name">Campus Expense Manager</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="open_drawer">Open</string>
@@ -77,4 +77,12 @@
     <string name="btn_reset_password">Reset Password</string>
     <string name="hint_username_or_email">Username or Email</string>
     <string name="btn_login">Login</string>
+
+    <!-- Sort options for Budget and Expense lists -->
+    <string-array name="sort_options">
+        <item>Amount ↑</item>
+        <item>Amount ↓</item>
+        <item>Name A-Z</item>
+        <item>Name Z-A</item>
+    </string-array>
 </resources>

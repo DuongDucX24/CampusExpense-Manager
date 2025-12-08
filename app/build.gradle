@@ -31,26 +31,24 @@ android {
 dependencies {
 
     implementation libs.appcompat
-    implementation libs.material
-    implementation libs.activity
     implementation libs.constraintlayout
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.gridlayout:gridlayout:1.0.0'
-    implementation "androidx.room:room-runtime:2.6.1"
+    implementation libs.material.v1120
+    implementation libs.gridlayout
+    implementation libs.cardview
+    implementation libs.room.runtime
     implementation libs.espresso.contrib
     implementation libs.uiautomator
     implementation libs.guava
     implementation libs.work.runtime.ktx
-    annotationProcessor "androidx.room:room-compiler:2.6.1"
-    implementation "androidx.work:work-runtime:2.9.0"
+    annotationProcessor libs.room.compiler
 
     // MPAndroidChart for safe chart implementation
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation libs.mpandroidchart
+    implementation libs.biometric
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:core:1.5.0'
-    androidTestImplementation libs.espresso.core.lib
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.test.runner
+    androidTestImplementation libs.test.core
+    androidTestImplementation libs.espresso.core
 }

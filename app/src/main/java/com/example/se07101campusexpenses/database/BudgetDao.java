@@ -37,4 +37,7 @@ public interface BudgetDao {
 
     @Query("SELECT * FROM budgets WHERE userId = :userId ORDER BY name ASC") // Added for getBudgetsByUserId
     List<Budget> getBudgetsByUserId(int userId);
+
+    @Query("DELETE FROM budgets WHERE userId = :userId")
+    void deleteByUserId(int userId);
 }

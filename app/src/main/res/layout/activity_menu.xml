@@ -16,22 +16,23 @@
             android:id="@+id/toolbar"
             android:elevation="4dp"
             android:background="#A6E4E9"/>
-        <androidx.viewpager2.widget.ViewPager2
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/viewPager"
-            android:layout_below="@id/toolbar"/>
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/bottom_navigation"
             app:labelVisibilityMode="labeled"
-            android:layout_alignBottom="@id/viewPager"
+            android:layout_alignParentBottom="true"
             app:menu="@menu/bottom_navigation"
             android:background="@color/white"
             app:itemIconTint="#3D0B97"
             app:itemTextColor="@color/black"
             tools:ignore="VisualLintBottomNav" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/viewPager"
+            android:layout_below="@id/toolbar"
+            android:layout_above="@id/bottom_navigation"/>
     </RelativeLayout>
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"

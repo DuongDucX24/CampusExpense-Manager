@@ -53,12 +53,24 @@ public class RecurringExpenseWorker extends Worker {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date startDate = sdf.parse(recurring.getStartDate());
             Date endDate = sdf.parse(recurring.getEndDate());
-            Date today = Calendar.getInstance().getTime();
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
 
-            if (today.after(startDate) && today.before(endDate)) {
-                // More sophisticated logic is needed here to check based on frequency
-                // For now, we'll just add it daily for demonstration purposes
-                return true;
+            if (today.getTime().after(startDate) && today.getTime().before(endDate)) {
+                Calendar startCal = Calendar.getInstance();
+                startCal.setTime(startDate);
+
+                switch (recurring.getFrequency().toLowerCase()) {
+                    case "daily":
+                        return true;
+                    case "weekly":
+                        return startCal.get(Calendar.DAY_OF_WEEK) == today.get(Calendar.DAY_OF_WEEK);
+                    case "monthly":
+                        return startCal.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Error parsing date", e);

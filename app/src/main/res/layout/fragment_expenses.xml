@@ -107,39 +107,66 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
+        <!-- Search and Sort Row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="1dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="8dp">
+                android:layout_weight="1"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="1dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    android:layout_marginStart="8dp"
-                    app:tint="@color/textColorSecondary" />
-
-                <EditText
-                    android:id="@+id/etSearchExpense"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:hint="Search expenses..."
-                    android:padding="8dp"
-                    android:textSize="14sp"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_search"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="Search icon"
+                        app:tint="@color/textColorSecondary" />
+
+                    <EditText
+                        android:id="@+id/etSearchExpense"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="Search expenses..."
+                        android:padding="8dp"
+                        android:textSize="14sp"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <Spinner
+                android:id="@+id/spinnerSortExpense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:minWidth="48dp" />
+        </LinearLayout>
+
+        <!-- View All Button -->
+        <Button
+            android:id="@+id/btnViewAllExpenses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="View All Expenses"
+            android:textAllCaps="false"
+            style="?attr/materialButtonOutlinedStyle" />
     </LinearLayout>
 
     <!-- Fixed Empty State - Shown when no expenses exist -->
@@ -147,9 +174,11 @@
         android:id="@+id/emptyStateContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/headerLayout"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="120dp"
@@ -185,27 +214,12 @@
         android:padding="8dp"
         android:visibility="gone">
 
-        <!-- This will be populated with max 3 expense items -->
+        <!-- This will be populated with max 4 expense items -->
         <LinearLayout
             android:id="@+id/expensesContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
-
-        <!-- Show More button -->
-        <TextView
-            android:id="@+id/tvShowMoreExpenses"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="..."
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:padding="8dp"
-            android:gravity="center"
-            android:background="?attr/selectableItemBackground"
-            android:visibility="gone"
-            android:clickable="true"
-            android:focusable="true" />
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -215,7 +229,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="16dp"
         android:src="@android:drawable/ic_input_add"
         app:elevation="10dp"
         app:borderWidth="0dp"
