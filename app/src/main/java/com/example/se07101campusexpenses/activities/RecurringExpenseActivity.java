@@ -14,13 +14,17 @@ import com.example.se07101campusexpenses.adapter.RecurringExpenseAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.RecurringExpenseDao;
 import com.example.se07101campusexpenses.model.RecurringExpense;
+import com.example.se07101campusexpenses.util.SessionManager;
 import java.util.List;
 
 public class RecurringExpenseActivity extends AppCompatActivity {
 
+    private SessionManager sessionManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_recurring_expense);
 
         RecyclerView rvRecurringExpenses = findViewById(R.id.rvRecurringExpenses);
@@ -44,6 +48,17 @@ public class RecurringExpenseActivity extends AppCompatActivity {
 
     private int getCurrentUserId() {
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        return prefs.getInt("user_id", -1); // Return -1 or handle appropriately if not found
+        return prefs.getInt("user_id", -1);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 }

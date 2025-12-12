@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -22,6 +23,7 @@ import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.model.Expense;
 import com.example.se07101campusexpenses.util.FormatUtils;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,10 +49,12 @@ public class EditExpenseActivity extends AppCompatActivity {
     private final List<Budget> availableBudgets = new ArrayList<>();
     private final List<Budget> filteredBudgets = new ArrayList<>();
     private ArrayAdapter<String> budgetAdapter;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_edit_expense);
 
         expenseRepository = new ExpenseRepository(this);
@@ -339,6 +343,17 @@ public class EditExpenseActivity extends AppCompatActivity {
                 String end = sdf.format(cal.getTime());
                 return new String[]{start, end};
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         }
     }
 }

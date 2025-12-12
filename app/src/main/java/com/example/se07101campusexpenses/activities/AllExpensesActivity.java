@@ -1,6 +1,7 @@
 package com.example.se07101campusexpenses.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -25,6 +26,7 @@ import com.example.se07101campusexpenses.adapter.ExpenseAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Expense;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,10 +55,12 @@ public class AllExpensesActivity extends AppCompatActivity {
     private int currentSortOrder = SORT_AMOUNT_HIGH_LOW;
     private EditText etSearchExpense;
     private Spinner spinnerSortExpense;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_all_expenses);
 
         // Set up toolbar
@@ -224,6 +228,13 @@ public class AllExpensesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
         loadAllExpenses();
     }
 

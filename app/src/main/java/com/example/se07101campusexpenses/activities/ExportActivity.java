@@ -39,6 +39,7 @@ import com.example.se07101campusexpenses.model.Expense;
 import com.example.se07101campusexpenses.model.RecurringExpense;
 import com.example.se07101campusexpenses.model.User;
 import com.example.se07101campusexpenses.security.PasswordUtils;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,6 +82,7 @@ public class ExportActivity extends AppCompatActivity {
 
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
+    private SessionManager sessionManager;
 
     private String pendingExportContent;
     private String pendingMimeType;
@@ -93,6 +95,7 @@ public class ExportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_export);
 
         initViews();
@@ -389,6 +392,17 @@ public class ExportActivity extends AppCompatActivity {
                 startActivityForResult(intent, CREATE_FILE_REQUEST_CODE);
             });
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

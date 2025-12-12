@@ -1,5 +1,6 @@
 package com.example.se07101campusexpenses.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -7,18 +8,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View; // Added for visibility control
+import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog; // Added for confirmation dialog
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetDao;
-import com.example.se07101campusexpenses.database.ExpenseDao; // Added for deletion constraint
+import com.example.se07101campusexpenses.database.ExpenseDao;
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.util.FormatUtils;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,12 +31,14 @@ public class EditBudgetActivity extends AppCompatActivity {
     private Budget budget;
     private EditText edtBudgetName, edtBudgetAmount, edtBudgetDescription;
     private Spinner spBudgetPeriod;
+    private SessionManager sessionManager;
 
     private final SimpleDateFormat isoFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         // Reuse add budget layout; we will change the title programmatically
         setContentView(R.layout.activity_add_budget);
 
@@ -187,6 +191,17 @@ public class EditBudgetActivity extends AppCompatActivity {
                 String end = sdf.format(cal.getTime());
                 return new String[]{start, end};
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         }
     }
 }

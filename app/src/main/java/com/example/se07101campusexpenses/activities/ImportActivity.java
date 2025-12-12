@@ -25,6 +25,7 @@ import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.database.ExpenseRepository;
 import com.example.se07101campusexpenses.model.Budget;
 import com.example.se07101campusexpenses.model.Expense;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class ImportActivity extends AppCompatActivity {
     private BudgetRepository budgetRepository;
     private int userId;
     private static final String TAG = "ImportActivity";
+    private SessionManager sessionManager;
 
     // Regex patterns for cleaning and parsing
     private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("\\[\\d{4}\\]");
@@ -75,6 +77,7 @@ public class ImportActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_import);
 
         etImportText = findViewById(R.id.etImportText);
@@ -110,6 +113,17 @@ public class ImportActivity extends AppCompatActivity {
                 Toast.makeText(this, "Text field is empty", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.example.se07101campusexpenses.adapter.BudgetRVAdapter;
 import com.example.se07101campusexpenses.database.AppDatabase;
 import com.example.se07101campusexpenses.database.BudgetRepository;
 import com.example.se07101campusexpenses.model.Budget;
+import com.example.se07101campusexpenses.util.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,10 +54,12 @@ public class AllBudgetsActivity extends AppCompatActivity {
     private EditText etSearchBudget;
     private Spinner spinnerSortBudget;
     private View emptyView;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
         setContentView(R.layout.activity_all_budgets);
 
         // Set up toolbar
@@ -224,6 +227,13 @@ public class AllBudgetsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (sessionManager.checkAndLockIfTimeout()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+            return;
+        }
         loadAllBudgets();
     }
 

@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.se07101campusexpenses.R;
 import com.example.se07101campusexpenses.adapter.ViewPagerAdapter;
+import com.example.se07101campusexpenses.util.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -27,12 +28,16 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
-    private static final String PREFS_NAME = "user_prefs"; // Added for SharedPreferences
-    private static final String KEY_USER_ID = "user_id"; // Added for SharedPreferences
+    private static final String PREFS_NAME = "user_prefs";
+    private static final String KEY_USER_ID = "user_id";
+
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sessionManager = new SessionManager(this);
+
         setContentView(R.layout.activity_menu);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         viewPager2 = findViewById(R.id.viewPager);
@@ -128,5 +133,18 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check if session should be locked due to timeout
+        if (sessionManager.checkAndLockIfTimeout()) {
+            // Redirect to login screen for re-authentication
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 }
