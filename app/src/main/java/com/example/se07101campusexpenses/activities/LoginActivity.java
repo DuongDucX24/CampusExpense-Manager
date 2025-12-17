@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
@@ -157,14 +158,33 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // For Xiaomi HyperOS 2.0 compatibility, use BIOMETRIC_WEAK with DEVICE_CREDENTIAL fallback
+        // This ensures face recognition works even when fingerprint is not enrolled
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle(isLockMode ? "Unlock Session" : "Biometric login for your app")
-                .setSubtitle(isLockMode ? "Verify your identity to continue" : "Log in using your biometric credential")
-                .setNegativeButtonText("Use account password")
+                .setSubtitle(isLockMode ? "Verify your identity to continue" : "Log in using fingerprint or face recognition")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build();
 
         Button btnBiometricLogin = findViewById(R.id.btnBiometricLogin);
-        btnBiometricLogin.setOnClickListener(view -> biometricPrompt.authenticate(promptInfo));
+
+        // Check if biometric or device credential authentication is available
+        BiometricManager biometricManager = BiometricManager.from(this);
+        int canAuthenticate = biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+
+        // Log the biometric status for debugging
+        Log.d("LoginActivity", "Biometric canAuthenticate result: " + canAuthenticate);
+
+        // Show biometric button if authentication is available
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            btnBiometricLogin.setVisibility(View.VISIBLE);
+            btnBiometricLogin.setOnClickListener(view -> biometricPrompt.authenticate(promptInfo));
+        } else {
+            // No authentication methods available
+            btnBiometricLogin.setVisibility(View.GONE);
+            Log.d("LoginActivity", "No authentication methods available, hiding button");
+        }
     }
 
     private void setupLockMode() {

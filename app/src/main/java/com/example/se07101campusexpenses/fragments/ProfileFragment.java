@@ -30,6 +30,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.Executor;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
@@ -101,10 +102,11 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // For Xiaomi HyperOS 2.0 compatibility, use BIOMETRIC_WEAK with DEVICE_CREDENTIAL fallback
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Biometric Authentication")
-                .setSubtitle("Confirm account deletion with your biometric credential")
-                .setNegativeButtonText("Cancel")
+                .setSubtitle("Confirm account deletion with fingerprint or face recognition")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build();
     }
 
@@ -122,7 +124,14 @@ public class ProfileFragment extends Fragment {
             verifyPasswordAndDelete(password);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.setNeutralButton("Use Biometrics", (dialog, which) -> biometricPrompt.authenticate(promptInfo));
+
+        // Check if biometric or device credential authentication is available
+        BiometricManager biometricManager = BiometricManager.from(requireContext());
+        int canAuthenticate = biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            builder.setNeutralButton("Use Biometrics", (dialog, which) -> biometricPrompt.authenticate(promptInfo));
+        }
 
         builder.show();
     }

@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
@@ -261,10 +262,11 @@ public class ExportActivity extends AppCompatActivity {
             }
         });
 
+        // For Xiaomi HyperOS 2.0 compatibility, use BIOMETRIC_WEAK with DEVICE_CREDENTIAL fallback
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Authentication Required")
-                .setSubtitle("Confirm your identity to export data")
-                .setNegativeButtonText("Use Password")
+                .setSubtitle("Confirm your identity with fingerprint or face recognition")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                 .build();
     }
 
@@ -351,7 +353,14 @@ public class ExportActivity extends AppCompatActivity {
             verifyPasswordAndExport(password);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.setNeutralButton("Use Biometrics", (dialog, which) -> biometricPrompt.authenticate(promptInfo));
+
+        // Check if biometric or device credential authentication is available
+        BiometricManager biometricManager = BiometricManager.from(this);
+        int canAuthenticate = biometricManager.canAuthenticate(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+        if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+            builder.setNeutralButton("Use Biometrics", (dialog, which) -> biometricPrompt.authenticate(promptInfo));
+        }
 
         builder.show();
     }
